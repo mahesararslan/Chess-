@@ -50,6 +50,7 @@ export class Game {
             this.board.move(move)
         } catch (error) {
             // send an error message to the player
+            console.log(error)
             return;
         }
 
@@ -66,15 +67,17 @@ export class Game {
                     winner: this.board.turn() === 'w' ? 'black' : 'white'
                 }
             }))
+
+            return;
         }
 
-        if (this.board.moves.length % 2 === 0) {
-            this.player2.emit(JSON.stringify({
+        if (this.board.turn() === 'b') {
+            this.player2.send(JSON.stringify({
                 type: "move",
                 payload: move
             }))
         } else {
-            this.player1.emit(JSON.stringify({
+            this.player1.send(JSON.stringify({
                 type: "move",
                 payload: move
             }))
@@ -86,6 +89,6 @@ export class Game {
 
         // check if the game is over
         // send the updated board to both players
-        return;
+        // return;
     }
 }
