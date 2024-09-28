@@ -38,10 +38,13 @@ export class Game {
 
         // check if it is the player's turn
         if (this.board.turn() === 'w' && socket === this.player2) {
+            console.log("It is not your turn, white's turn")
             return;
         }
+        
 
         if (this.board.turn() === 'b' && socket === this.player1) {
+            console.log("It is not your turn, black's turn")
             return;
         }
         

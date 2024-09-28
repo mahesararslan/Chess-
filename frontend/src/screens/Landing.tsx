@@ -1,17 +1,19 @@
 import { useNavigate } from "react-router-dom"
 import { Button } from "../components/Button";
+import { Appbar } from "../components/Appbar";
 
 export const Landing = () => {
     const navigate = useNavigate();
-    return <div className="flex justify-center">
+    return <div className="flex flex-col items-center bg-stone-800 md:h-screen">
+        <Appbar />
         <div className="pt-8 max-w-screen-lg">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex justify-center">
-                    <img src={"/chessboard.jpeg"} className="max-w-96" />
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 ">
+                <div className="flex justify-center bg-stone-800">
+                    <img src={"/chessboard.png"} className="max-w-96 shadow-lg" />
                 </div>
                 <div className="pt-16">
                     <div className="flex justify-center">
-                        <h1 className="text-4xl font-bold text-white">Play chess online on the #2 Site!</h1>
+                        <h1 className="text-4xl font-bold text-white">Play chess online!</h1>
                     </div>
                     <div className="mt-8 flex justify-center">
                         <Button onClick={() => {

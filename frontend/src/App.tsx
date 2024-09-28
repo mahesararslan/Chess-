@@ -6,7 +6,7 @@ import { Game } from './screens/Game'
 function App() {
 
   return (
-    <div>
+    <div className=''>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Landing />} />
