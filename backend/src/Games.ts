@@ -58,13 +58,24 @@ export class Game {
         }
 
         if (this.board.isGameOver()) { // Stringify it because you can only send strings over the websockets
-            this.player1.emit (JSON.stringify({
+            if (this.board.turn() === 'b') {
+                this.player2.send(JSON.stringify({
+                    type: "move",
+                    payload: move
+                }))
+            } else {
+                this.player1.send(JSON.stringify({
+                    type: "move",
+                    payload: move
+                }))
+            }
+            this.player1.send (JSON.stringify({
                 type: GAME_OVER,
                 payload: {
                     winner: this.board.turn() === 'w' ? 'black' : 'white'
                 }
             }))
-            this.player2.emit (JSON.stringify({
+            this.player2.send (JSON.stringify({
                 type: GAME_OVER,
                 payload: {
                     winner: this.board.turn() === 'w' ? 'black' : 'white'

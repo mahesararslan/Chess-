@@ -9,6 +9,7 @@ export const INIT_GAME = "init_game";
 export const MOVE = "move";
 export const GAME_OVER = "game_over";
 
+
 export const Game = () => {
     const socket = useSocket();
     const [chess, setChess] = useState(new Chess());
@@ -40,6 +41,9 @@ export const Game = () => {
                     break;
                 case GAME_OVER:
                     console.log("Game over");
+                    const finalMove = message.payload;
+                    chess.move(finalMove);
+                    setBoard(chess.board());
                     break;
             }
         }
