@@ -132,6 +132,35 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
     next();
 };
 
+
+// @ts-ignore
+app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { // @ts-ignore
+                id: req.userId
+            }
+        });
+    
+        if (!user) {
+            return res.status(401).json({
+                message: 'User not found',
+            });
+        }
+    
+        return res.status(200).json({
+            name: user.name,
+            username: user.email,
+            id: user.id,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+        });
+    }
+})
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

@@ -24,7 +24,7 @@ const SigninForm = () => {
             
             if(response.data.token) {
                 localStorage.setItem("token", response.data.token);
-                navigate("/home");
+                navigate("/");
             }
         }
         catch (error) {
