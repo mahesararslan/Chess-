@@ -1,6 +1,7 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useState, useEffect } from "react";
 import { MOVE } from "../screens/Game";
+import { useNavigate } from "react-router-dom";
 
 interface Piece {
     square: Square;
@@ -30,6 +31,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
     const [checkmate, setCheckmate] = useState<boolean>(false);
+    const [winner, setWinner] = useState<Color | null>(null);
 
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;
@@ -50,6 +52,8 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         if (chess.inCheck()) {
 
             if (chess.isCheckmate()) {
+                const winner = chess.turn() === 'w' ? 'b' : 'w';
+                setWinner(winner);   
                 setCheckmate(true);
             }
             if (chess.turn() === 'w') {
@@ -181,7 +185,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
     return (
         <div className="text-white-200 rounded-lg">
-            {checkmate && <Notification visible={checkmate} />}
+            {checkmate && <Notification winner={winner} visible={checkmate} />}
 
             {displayBoard.map((row, i) => {
                 const displayRow = isBlack ? [...row].reverse() : row;
@@ -229,9 +233,11 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     );
 };
 
-const Notification = ({visible}: {
+const Notification = ({visible, winner}: {
     visible: boolean;
+    winner: Color | null;
 }) => {
+    const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(visible);
   
     const closeNotification = () => {
@@ -243,13 +249,23 @@ const Notification = ({visible}: {
     return (
       <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="relative bg-white p-6 rounded-lg shadow-lg w-80">
-          <button
-            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-            onClick={closeNotification}
-          >
-            &times;
-          </button>
-          <p className="text-center">Your notification message goes here!</p>
+            <button
+                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                onClick={closeNotification}
+            >
+                &times;
+            </button>
+            <div className="p-6 text-center">
+                    <h2 className="text-2xl font-bold mb-4">Game Over</h2>
+                    <p className="text-xl">
+                        {winner === 'w' ? "White" : "Black"} wins by checkmate!
+                    </p>
+                    <button className="font-bold p-5 mt-8 bg-stone-800 w-full hover:bg-stone-600 rounded-lg text-white" onClick={() => {
+                        navigate("/game")
+                    }}>
+                        Dashboard
+                    </button>
+            </div>
         </div>
       </div>
     );
