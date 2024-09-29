@@ -2,14 +2,16 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import GoogleButton from "./GoogleButton";
 import { signupSchema } from "../zodTypes";
+import axios from "axios";
 
 type FormFields = z.infer<typeof signupSchema>;
 
 const SignupForm = () => {
+    const navigate = useNavigate();
 
     const { register, handleSubmit, setError, formState:{errors, isSubmitting} } = useForm<FormFields>({
         resolver: zodResolver(signupSchema)
@@ -17,9 +19,13 @@ const SignupForm = () => {
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            console.log(data);
-            throw new Error();
+            
+            const response: any = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/signup`, data);
+
+            if(response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                navigate("/home");
+            }
         }
         catch (error) {
             setError("root", {
