@@ -156,6 +156,7 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
     }
     catch (error) {
         return res.status(500).json({
+            error,
             message: 'Internal server error',
         });
     }

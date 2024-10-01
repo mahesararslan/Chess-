@@ -2,6 +2,8 @@ import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useState, useEffect } from "react";
 import { MOVE } from "../screens/Game";
 import { useNavigate } from "react-router-dom";
+import { Avatar, Avatar2 } from "./Avatar";
+import { Notification } from "./Notification";
 
 interface Piece {
     square: Square;
@@ -16,6 +18,8 @@ interface ChessBoardProps {
     setBoard: React.Dispatch<React.SetStateAction<(Piece | null)[][]>>;
     isBlack: boolean;
     gameStarted: boolean;
+    opponent: string;
+    myName: string;
 }
 
 export const ChessBoard: React.FC<ChessBoardProps> = ({
@@ -24,7 +28,9 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     socket,
     setBoard,
     isBlack,
-    gameStarted
+    gameStarted,
+    opponent,
+    myName
 }) => {
     const [from, setFrom] = useState<Square | null>(null);
     const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
@@ -45,6 +51,9 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         updateCheckStatus();
     }, [board, chess]);
 
+    // checking logs
+    // console.log("MY NAME ",myName);
+    // console.log("Opp ",opponent);
     const updateCheckStatus = () => {
         const whiteKingSquare = findKingSquare('w');
         const blackKingSquare = findKingSquare('b');
@@ -185,6 +194,24 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
     return (
         <div className="text-white-200 rounded-lg">
+            { opponent ? 
+            (
+                <div className="flex justify-between mb-5">
+                <div className="flex gap-2 text-white font-bold text-lg">
+                    <Avatar2 name={myName} size="small" />
+                    <div className="flex flex-col justify-center">
+                        <p>{myName}</p>
+                    </div>
+                </div>
+                <div className="flex gap-2 text-white font-bold text-lg">
+                    <div className="flex flex-col justify-center">
+                        <p>{opponent}</p>
+                    </div>
+                    <Avatar2 name={opponent} size="small" />
+                </div>
+            </div>
+            ) : null
+            }
             {checkmate && <Notification winner={winner} visible={checkmate} />}
 
             {displayBoard.map((row, i) => {
@@ -233,41 +260,5 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     );
 };
 
-const Notification = ({visible, winner}: {
-    visible: boolean;
-    winner: Color | null;
-}) => {
-    const navigate = useNavigate();
-    const [isVisible, setIsVisible] = useState(visible);
-  
-    const closeNotification = () => {
-      setIsVisible(false);
-    };
-  
-    if (!isVisible) return null;
-  
-    return (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="relative bg-white p-6 rounded-lg shadow-lg w-80">
-            <button
-                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                onClick={closeNotification}
-            >
-                &times;
-            </button>
-            <div className="p-6 text-center">
-                    <h2 className="text-2xl font-bold mb-4">Game Over</h2>
-                    <p className="text-xl">
-                        {winner === 'w' ? "White" : "Black"} wins by checkmate!
-                    </p>
-                    <button className="font-bold p-5 mt-8 bg-stone-800 w-full hover:bg-stone-600 rounded-lg text-white" onClick={() => {
-                        navigate("/game")
-                    }}>
-                        Dashboard
-                    </button>
-            </div>
-        </div>
-      </div>
-    );
-  };
+
   

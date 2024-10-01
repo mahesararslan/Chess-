@@ -53,7 +53,7 @@ export const Appbar = () => {
                         <button onClick={haneleLogout} className="text-white font-bold py-2 px-3 bg-stone-700 rounded-lg hover:bg-stone-800">
                             Logout
                         </button>
-                        <Avatar name={name} size="big" />
+                        <Avatar name={name} size="small" />
                     </div>
                 ) : (
                     // Render Login and Signup buttons if the user is not logged in
