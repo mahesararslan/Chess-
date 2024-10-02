@@ -6,11 +6,13 @@ import { useSocket } from "../hooks/useSocket";
 import { Appbar } from "../components/Appbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ResignNotification } from "../components/Notification";
+import { ErrorNotification, Notification, ResignNotification } from "../components/Notification";
+import { error } from "console";
 
 export const INIT_GAME = "init_game";
 export const MOVE = "move";
 export const GAME_OVER = "game_over";
+export const ERROR = "error"
 
 export const Game = () => {
   const socket = useSocket();
@@ -24,6 +26,8 @@ export const Game = () => {
   const [loader, setLoader] = useState(false);
   const [resignMessage, setResignMessage] = useState(""); // To show opponent resignation
   const [winner, setWinner] = useState(null); // To track the winner
+  const [gameOver, setGameOver] = useState(false);
+  const [error, setError] = useState("");
 
   // Fetch the user details
   useEffect(() => {
@@ -70,6 +74,7 @@ export const Game = () => {
           setGameStarted(false);
           setStarted(false);
           setLoader(false);
+          setGameOver(true);
           const { winner, loser, resign } = message.payload;
 
           if (resign) { // @ts-ignore
@@ -78,6 +83,10 @@ export const Game = () => {
             const winningPlayer = winner === user?.name ? user?.name : opponent;
             setWinner(winningPlayer);
           }
+          break;
+        case ERROR:
+          console.error(message.payload.message);
+          setError(message.payload.message);
           break;
       }
     };
@@ -168,10 +177,13 @@ export const Game = () => {
                     Dashboard
                   </button>
                 )}
-                {/* Display resignation message */}
                 {resignMessage && (
                   <ResignNotification message={resignMessage} visible={resignMessage !== ""} />
                 )}
+                {gameOver && !resignMessage && (
+                  <Notification visible={true} winner={winner} />
+                )}
+                {error && <ErrorNotification visible={true} message={error} />}
               </div>
             </div>
           </div>

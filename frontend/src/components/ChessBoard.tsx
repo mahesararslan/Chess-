@@ -1,9 +1,7 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useState, useEffect } from "react";
 import { MOVE } from "../screens/Game";
-import { useNavigate } from "react-router-dom";
-import { Avatar, Avatar2 } from "./Avatar";
-import { Notification } from "./Notification";
+import { Avatar2 } from "./Avatar";
 
 interface Piece {
     square: Square;
@@ -36,9 +34,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
-    const [checkmate, setCheckmate] = useState<boolean>(false);
-    const [winner, setWinner] = useState<Color | null>(null);
-
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;
 
@@ -59,12 +54,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         const blackKingSquare = findKingSquare('b');
 
         if (chess.inCheck()) {
-
-            if (chess.isCheckmate()) {
-                const winner = chess.turn() === 'w' ? 'b' : 'w';
-                setWinner(winner);   
-                setCheckmate(true);
-            }
             if (chess.turn() === 'w') {
                 setWhiteKingInCheck(whiteKingSquare);
                 setBlackKingInCheck(null);
@@ -212,7 +201,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
             </div>
             ) : null
             }
-            {checkmate && <Notification winner={winner} visible={checkmate} />}
 
             {displayBoard.map((row, i) => {
                 const displayRow = isBlack ? [...row].reverse() : row;
