@@ -46,9 +46,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
         updateCheckStatus();
     }, [board, chess]);
 
-    // checking logs
-    // console.log("MY NAME ",myName);
-    // console.log("Opp ",opponent);
     const updateCheckStatus = () => {
         const whiteKingSquare = findKingSquare('w');
         const blackKingSquare = findKingSquare('b');

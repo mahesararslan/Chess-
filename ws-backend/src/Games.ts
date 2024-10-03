@@ -22,12 +22,12 @@ export class Game {
         this.moves = [];
         this.startTime = new Date();
 
-        // Notify both players that the game has started, sending the opponent's name
+        
         this.player1.socket.send(JSON.stringify({
             type: INIT_GAME,
             payload: {
                 color: "white",
-                opponentName: player2.userName  // Player 1 sees Player 2's name
+                opponentName: player2.userName  
             }
         }));
 
@@ -35,7 +35,7 @@ export class Game {
             type: INIT_GAME,
             payload: {
                 color: "black",
-                opponentName: player1.userName  // Player 2 sees Player 1's name
+                opponentName: player1.userName  
             }
         }));
     }
@@ -58,7 +58,7 @@ export class Game {
             return;
         }
 
-        // If game is over, notify both players with the winner's information
+        
         if (this.board.isGameOver()) {
             const winnerName = this.board.turn() === 'w' ? this.player2.userName : this.player1.userName;
 
@@ -79,7 +79,7 @@ export class Game {
             return;
         }
 
-        // Broadcast the move to both players
+        
         const opponentSocket = socket === this.player1.socket ? this.player2.socket : this.player1.socket;
 
         opponentSocket.send(JSON.stringify({
@@ -98,7 +98,7 @@ export class Game {
             payload.loser = loser;
         }
     
-        // Notify both players with game over details
+       
         this.player1.socket.send(JSON.stringify({
             type: GAME_OVER,
             payload: {

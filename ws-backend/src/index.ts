@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import { GameManager } from './GameManager'
 
 const wss = new WebSocket.Server({ port: 8080 })
-const gameManager = new GameManager()
+const gameManager = GameManager.getInstance();
 
 wss.on('connection', (ws) => {
 
@@ -22,3 +22,18 @@ wss.on('connection', (ws) => {
 
     ws.send('Hello! Message From Server!!')
 })
+
+class Singleton {
+    private static instance: Singleton | null = null;
+
+    private constructor() {
+        console.log('Singleton instance created');
+    }
+
+    public static getInstance(): Singleton {
+        if (!this.instance) {
+            this.instance = new Singleton(); 
+        }
+        return this.instance;
+    }
+}

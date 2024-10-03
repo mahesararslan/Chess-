@@ -10,22 +10,55 @@ interface User {
 }
 
 export class GameManager {
+    private static instance: GameManager;
     private games: Game[] = [];
     private pendingUser: User | null;
-    private users: User[] = []; // Store both socket, userId, and userName
+    private users: User[] = [];
 
-    constructor() {
+    private constructor() {
         this.games = [];
         this.pendingUser = null;
     }
 
+    // singleton getIntance()
+    public static getInstance() {
+        if(!this.instance) {
+            this.instance = new GameManager();
+        }
+        return this.instance;
+    }
+
     addUser(socket: WebSocket) {
-        this.users.push({ socket, userId: "", userName: "" }); // Add user without id initially
+        this.users.push({ socket, userId: "", userName: "" }); 
         this.addHandler(socket);
     }
 
     removeUser(socket: WebSocket) {
-        this.users = this.users.filter(user => user.socket !== socket);
+        const disconnectedUser = this.users.find(user => user.socket === socket);
+
+        if (disconnectedUser) {
+            const game = this.games.find(game => 
+                game.player1.socket === socket || game.player2.socket === socket
+            );
+
+            if (game) {
+                const opponent = game.player1.socket === socket ? game.player2 : game.player1;
+
+                
+                opponent.socket.send(JSON.stringify({
+                    type: GAME_OVER,
+                    payload: {
+                        disconnected: true,
+                        message: "You have won because your opponent has left the game."
+                    }
+                }));
+
+                
+                this.games = this.games.filter(g => g !== game);
+            }
+
+            this.users = this.users.filter(user => user.socket !== socket);
+        }
     }
 
     private addHandler(socket: WebSocket) {
@@ -35,7 +68,7 @@ export class GameManager {
             if (message.type === INIT_GAME) {
                 const { userId, userName } = message.payload;
 
-                // Check if the user is already in a game
+                
                 const isUserInGame = this.users.some(user => user.userId === userId && user.socket !== socket);
                 if (isUserInGame) {
                     socket.send(JSON.stringify({
@@ -47,7 +80,7 @@ export class GameManager {
                     return;
                 }
 
-                // Update user's id and name in users array
+                
                 this.users = this.users.map(user => {
                     if (user.socket === socket) {
                         return { socket, userId, userName };
@@ -56,15 +89,15 @@ export class GameManager {
                 });
 
                 if (this.pendingUser) {
-                    // Create a new game if there's a pending user
+                   
                     const game = new Game(this.pendingUser, { socket, userId, userName });
                     this.games.push(game);
 
-                    // Notify both players that the game has started and send opponent's name
+                    
                     this.pendingUser.socket.send(JSON.stringify({
                         type: INIT_GAME,
                         payload: {
-                            opponentName: userName,  // Send opponent's name to pending user
+                            opponentName: userName,  
                             color: "white"
                         }
                     }));
@@ -72,14 +105,14 @@ export class GameManager {
                     socket.send(JSON.stringify({
                         type: INIT_GAME,
                         payload: {
-                            opponentName: this.pendingUser.userName,  // Send opponent's name to the new user
+                            opponentName: this.pendingUser.userName, 
                             color: "black"
                         }
                     }));
 
-                    this.pendingUser = null; // Reset pending user
+                    this.pendingUser = null; 
                 } else {
-                    // Set this user as pending
+                    
                     this.pendingUser = { socket, userId, userName };
                 }
             }
@@ -95,7 +128,7 @@ export class GameManager {
                 const game = this.games.find((game) => game.player1.socket === socket || game.player2.socket === socket);
                 if (game) {
                     game.endGame(socket, message.payload);
-                    this.games = this.games.filter(g => g !== game); // Remove the game from the list of games
+                    this.games = this.games.filter(g => g !== game); 
                 }
             }
         });
