@@ -216,7 +216,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                                     onClick={() => handleSquareClick(squareRepresentation, square)}
                                     onDragOver={handleDragOver}
                                     onDrop={() => handleDrop(squareRepresentation)}
-                                    className={`w-16 h-16 ${(i + j) % 2 === 0 ? "bg-lime-100" : "bg-lime-700"} 
+                                    className={`w-10 h-10 sm:w-14 sm:h-14  ${(i + j) % 2 === 0 ? "bg-lime-100" : "bg-lime-700"} 
                                         ${isSelected ? "border-4 border-yellow-500" : ""}
                                         ${isInCheck ? "border-4 border-red-600" : ""}`}
                                 >

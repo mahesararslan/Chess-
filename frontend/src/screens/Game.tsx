@@ -127,9 +127,9 @@ export const Game = () => {
   return (
     <div>
       <Appbar />
-      <div className="justify-center flex bg-stone-700">
+      <div className="justify-center flex bg-stone-700 h-screen lg:h-auto ">
         <div className="pt-8 max-w-screen-lg w-full ">
-          <div className="grid grid-cols-6 gap-4 w-full">
+          <div className="lg:grid lg:grid-cols-6 gap-4 w-full">
             <div className="p-8 col-span-4 w-full flex justify-center bg-stone-800">
               <ChessBoard
                 isBlack={isBlack}
@@ -143,7 +143,7 @@ export const Game = () => {
               />
             </div>
             <div className="col-span-2 bg-stone-800 w-full flex flex-col items-center">
-              <div className="pt-8 max-w-full flex flex-col gap-5 justify-center">
+              <div className="pt-8 max-w-full flex flex-col gap-5 justify-center pb-10 sm:pb-0">
                 
                 {!started && loader && <h1 className="text-2xl text-white">Waiting for opponent...</h1>}
                 
