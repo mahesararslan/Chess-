@@ -5,6 +5,7 @@ import { signinSchema, signupSchema } from './zodTypes';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import passport from './auth';
 
 dotenv.config();
 
@@ -16,9 +17,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', async (req, res) => {
-    const users = await prisma.user.findMany();
-  res.send('Hello World');
+app.get('/auth/google', passport.authenticate('google', {
+    session: false,
+    scope: ['email', 'profile'], 
+}));
+
+app.get('/auth/google/callback', passport.authenticate('google',{
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_URL}/signin`,
+}), function (req, res) { // @ts-ignore
+    const token = req.user.token; 
+    res.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
 });
 
 
@@ -118,11 +127,13 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
     }
 
     const token = authHeader.split(' ')[1];
+    
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
         // @ts-ignore
-        req.userId = decoded.id;
+        req.userId = decoded.id; // @ts-ignore
+    
     } catch (error) {
         return res.status(401).json({
             message: 'Invalid token',
@@ -135,7 +146,8 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
 
 // @ts-ignore
 app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
-    try {
+    try { // @ts-ignore
+        
         const user = await prisma.user.findUnique({
             where: { // @ts-ignore
                 id: req.userId

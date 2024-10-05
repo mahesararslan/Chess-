@@ -1,4 +1,4 @@
-export default function GoogleButton({label ,onClick} : { label:string, onClick: () => void}) {
+export default function GoogleButton({label ,onClick} : { label:string, onClick: (event: any) => void}) {
     return (
       <button
         onClick={onClick}

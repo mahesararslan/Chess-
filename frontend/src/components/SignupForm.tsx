@@ -57,8 +57,9 @@ const SignupForm = () => {
         <button disabled={isSubmitting} type="submit" className="w-full font-bold text-white bg-stone-900 hover:ring-4 focus:outline-none hover:ring-zinc-900 text-md rounded-lg px-5 py-3 text-center">
             {isSubmitting ? "Signing up..." : "Sign up"}
         </button>
-        <GoogleButton label={"Sign up with Google"} onClick={() => {
-            console.log("Google Signin clicked");
+        <GoogleButton label={"Sign up with Google"} onClick={(event: any) => {
+            event.preventDefault();
+            window.location.href = `${import.meta.env.VITE_NODE_BACKEND_URL}/auth/google`;
         }} />
         <Link to={"/signin"}>
             <p className="underline mt-5 text-center" >Already have an Account?</p>

@@ -1,9 +1,22 @@
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Button } from "../components/Button";
 import { Appbar } from "../components/Appbar";
+import { useEffect } from "react";
 
 export const Landing = () => {
     const navigate = useNavigate();
+    // get token from url
+    const query = new URLSearchParams(useLocation().search);
+    const token = query.get("token");
+
+    useEffect(() => { 
+        console.log("token", token)
+        if(token) {
+            localStorage.setItem("token", token || "");
+        }
+        
+    })
+
     return <div className="flex flex-col items-center bg-stone-800 h-screen">
         <Appbar />
         <div className="pt-8 max-w-screen-lg">
@@ -18,6 +31,7 @@ export const Landing = () => {
                     <div className="mb-5 md:mb-0 mt-8 flex justify-center">
                         <Button onClick={() => {
                             navigate("/game")
+
                         }} >
                             Play Online
                         </Button>
