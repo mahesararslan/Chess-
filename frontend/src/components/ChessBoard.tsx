@@ -18,6 +18,8 @@ interface ChessBoardProps {
     gameStarted: boolean;
     opponent: string;
     myName: string;
+    timeWhite: number;
+    timeBlack: number;
 }
 
 export const ChessBoard: React.FC<ChessBoardProps> = ({
@@ -28,12 +30,21 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     isBlack,
     gameStarted,
     opponent,
-    myName
+    myName,
+    timeWhite,
+    timeBlack,
+
 }) => {
     const [from, setFrom] = useState<Square | null>(null);
     const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
+
+    // Timer states
+    const [whiteTime, setWhiteTime] = useState(timeWhite); // 5 minutes = 300 seconds
+    const [blackTime, setBlackTime] = useState(timeBlack); // 5 minutes = 300 seconds
+    const [isWhiteTurn, setIsWhiteTurn] = useState(chess.turn() === 'w');
+
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;
 
@@ -44,7 +55,26 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
     useEffect(() => {
         updateCheckStatus();
-    }, [board, chess]);
+    
+        const timer = setInterval(() => {
+            if (!gameStarted) return; // Timer should only run when the game starts
+    
+            // Decrease the time based on whose turn it is
+            if (chess.turn() === 'w') {
+                setWhiteTime((prev) => Math.max(prev - 1, 0)); // Decrease white's time
+            } else {
+                setBlackTime((prev) => Math.max(prev - 1, 0)); // Decrease black's time
+            }
+        }, 1000);
+    
+        return () => clearInterval(timer); // Clear interval on unmount
+    }, [chess, gameStarted]);
+
+    const formatTime = (time: number) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    };
 
     const updateCheckStatus = () => {
         const whiteKingSquare = findKingSquare('w');
@@ -109,13 +139,14 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                         JSON.stringify({
                             type: MOVE,
                             payload: {
-                                move: { from, to: squareRepresentation }
-                            }
+                                move: { from, to: squareRepresentation },
+                            },
                         })
                     );
                     setBoard(chess.board());
                     setFrom(null);
                     setSelectedSquare(null);
+                    setIsWhiteTurn(chess.turn() === 'w'); // Update turn based on the game state
                     updateCheckStatus();
                 } else {
                     console.log("Invalid move attempted");
@@ -150,13 +181,14 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                     JSON.stringify({
                         type: MOVE,
                         payload: {
-                            move: { from, to: squareRepresentation }
-                        }
+                            move: { from, to: squareRepresentation },
+                        },
                     })
                 );
                 setBoard(chess.board());
                 setFrom(null);
                 setSelectedSquare(null);
+                setIsWhiteTurn(chess.turn() === 'w'); // Update turn based on the game state
                 updateCheckStatus();
             } else {
                 console.log("Invalid move attempted");
@@ -180,24 +212,19 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
     return (
         <div className="text-white-200 rounded-lg">
-            { opponent ? 
-            (
-                <div className="flex justify-between mb-5">
-                <div className="flex gap-2 text-white font-bold text-lg">
-                    <Avatar2 name={myName} size="small" />
-                    <div className="flex flex-col justify-center">
-                        <p>{myName}</p>
+            {opponent && gameStarted ? (
+                <div className="flex justify-between mb-2">
+                    <div className="flex gap-2 text-white font-bold text-lg">
+                        <Avatar2 name={myName} size="small" />
+                        <div className="flex flex-col justify-center font-sans text-2xl">
+                            <p>{myName}</p>
+                        </div>
+                    </div>
+                    <div className="text-5xl font-mono font-bold text-center text-stone-200">
+                        {isBlack ? <p>{formatTime(whiteTime)}</p> : <p>{formatTime(blackTime)}</p>}
                     </div>
                 </div>
-                <div className="flex gap-2 text-white font-bold text-lg">
-                    <div className="flex flex-col justify-center">
-                        <p>{opponent}</p>
-                    </div>
-                    <Avatar2 name={opponent} size="small" />
-                </div>
-            </div>
-            ) : null
-            }
+            ) : null}
 
             {displayBoard.map((row, i) => {
                 const displayRow = isBlack ? [...row].reverse() : row;
@@ -241,6 +268,20 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                     </div>
                 );
             })}
+            {opponent && gameStarted ? (
+                <div className="flex justify-between mt-2">
+                    <div className="flex gap-2 text-white font-bold text-lg">
+                        <Avatar2 name={opponent} size="small" />
+                        <div className="flex flex-col justify-center font-sans text-2xl">
+                            <p>{opponent}</p>
+                        </div>
+                    </div>
+                    <div className="text-5xl font-mono font-bold text-center text-stone-200">
+                        {isBlack ? <p>{formatTime(blackTime)}</p> : <p>{formatTime(whiteTime)}</p>}
+                    </div>
+                </div>
+            )
+            : null}
         </div>
     );
 };

@@ -10,6 +10,7 @@ export const Notification = ({visible, winner}: {
   
     const closeNotification = () => {
       setIsVisible(false);
+      window.location.reload();
     };
   
     if (!isVisible) return null;
@@ -43,6 +44,7 @@ export const Notification = ({visible, winner}: {
   
     const closeNotification = () => {
       setIsVisible(false);
+      window.location.reload();
     };
   
     if (!isVisible) return null;
@@ -75,6 +77,7 @@ export const Notification = ({visible, winner}: {
   
     const closeNotification = () => {
       setIsVisible(false);
+      window.location.reload();
     };
   
     if (!isVisible) return null;

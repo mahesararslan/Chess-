@@ -28,6 +28,10 @@ export const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [error, setError] = useState("");
   const [disconnectedMessage, setDisconnectedMessage] = useState("");
+  const [whiteTime, setWhiteTime] = useState(300); // Default: 5 minutes
+  const [blackTime, setBlackTime] = useState(300); // Default: 5 minutes
+  const [timeControl, setTimeControl] = useState(300); // Default to 5 minutes
+  
 
   // Fetch the user details
   useEffect(() => {
@@ -98,7 +102,12 @@ export const Game = () => {
     };
   }, [socket, chess, opponent, user]);
 
-  const handleResign = () => { // @ts-ignore
+
+  const handleResign = () => { 
+    // Reset timers and game state
+    setWhiteTime(timeControl);
+    setBlackTime(timeControl);
+    // @ts-ignore
     const resigningPlayer = user?.name; // @ts-ignore
     const winningPlayer = resigningPlayer === user?.name ? opponent : user?.name;
  // @ts-ignore
@@ -140,13 +149,35 @@ export const Game = () => {
                 gameStarted={gameStarted}
                 opponent={opponent} // @ts-ignore
                 myName={user?.name}
+                timeWhite={whiteTime}
+                timeBlack={blackTime}
               />
             </div>
             <div className="col-span-2 bg-stone-800 w-full flex flex-col items-center">
               <div className="pt-8 max-w-full flex flex-col gap-5 justify-center pb-10 sm:pb-0">
                 
                 {!started && loader && <h1 className="text-2xl text-white">Waiting for opponent...</h1>}
+                {!loader && !started && (
+                  <div className="flex flex-col items-center">
+                  <label htmlFor="time-control" className="text-white text-lg">Select Time Control</label>
+                  <select
+                    id="time-control"
+                    value={timeControl}
+                    onChange={(e) => {
+                      const selectedTime = parseInt(e.target.value);
+                      setTimeControl(selectedTime);
+                      setWhiteTime(selectedTime);
+                      setBlackTime(selectedTime);
+                    }}
+                    className="text-lg bg-stone-800 text-white py-2 px-4 rounded"
+                  >
+                    <option value={60}>1 minute</option>
+                    <option value={180}>3 minutes</option>
+                    <option value={300}>5 minutes</option>
+                  </select>
+                </div>
                 
+                )}
                 {!loader && !started && (
                   <Button
                     onClick={() => {
@@ -157,6 +188,7 @@ export const Game = () => {
                           payload: { // @ts-ignore
                             userId: user?.id, // @ts-ignore
                             userName: user?.name,
+                            timeLimit: timeControl,
                           },
                         })
                       );
@@ -165,11 +197,11 @@ export const Game = () => {
                     Play
                   </Button>
                 )}
-                
+
                 {started && (
                   <button
                     onClick={handleResign}
-                    className="mx-5 shadow-lg px-8 py-4 w-full text-2xl bg-lime-700 hover:bg-lime-400 text-white font-bold rounded"
+                    className="mx-5 shadow-lg px-8 py-4 max-w-full text-2xl bg-lime-700 hover:bg-lime-400 text-white font-bold rounded"
                   >
                     Resign
                   </button>
@@ -177,7 +209,7 @@ export const Game = () => {
                 {!started && !loader && (
                   <button
                   onClick={() => navigate("/")}
-                  className="mx-5 shadow-lg px-8 py-4 w-full text-2xl bg-stone-700 hover:bg-stone-900 text-white font-bold rounded"
+                  className="mx-5 shadow-lg px-8 py-4 max-w-full text-2xl bg-stone-700 hover:bg-stone-900 text-white font-bold rounded"
                 >
                   Dashboard
                 </button>
