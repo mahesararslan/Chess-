@@ -164,6 +164,10 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
             name: user.name,
             username: user.email,
             id: user.id,
+            total_games: user.total_games,
+            wins: user.wins,
+            draws: user.draws,
+            losses: user.losses,
         });
     }
     catch (error) {

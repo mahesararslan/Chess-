@@ -11,21 +11,24 @@ const Profile = () => {
             console.log("No token found, redirecting to login");
         }
 
-            const response = axios.get(`${import.meta.env.VITE_NODE_BACKEND_URL}/get-user`, {
+            axios.get(`${import.meta.env.VITE_NODE_BACKEND_URL}/get-user`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             })
             .then((response) => {
                 setUser(response.data);
+                console.log("User", user);
             }).catch((error) => {
                 console.error("Error fetching user:", error);
             });
     }, []); 
 
+    if(!user) return <div>Loading...</div>
+
     return <div className="h-screen bg-stone-700">
         {/* @ts-ignore */}
-        <UserAccountInfo name={user.name} username={user.email} totalGames={user.total_games} wins={user.wins} draws={user.draws} losses={user.losses} />
+        <UserAccountInfo name={user.name} username={user.username} totalGames={user.total_games} wins={user.wins} draws={user.draws} losses={user.losses} />
     </div>
 }
 
