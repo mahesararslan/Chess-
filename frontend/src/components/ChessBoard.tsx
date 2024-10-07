@@ -2,6 +2,8 @@ import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useState, useEffect } from "react";
 import { MOVE } from "../screens/Game";
 import { Avatar2 } from "./Avatar";
+import { time } from "console";
+import { timeout } from "hono/timeout";
 
 interface Piece {
     square: Square;
@@ -54,6 +56,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     };
 
     useEffect(() => {
+
         updateCheckStatus();
     
         const timer = setInterval(() => {
@@ -220,9 +223,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                             <p>{myName}</p>
                         </div>
                     </div>
-                    <div className="text-5xl font-mono font-bold text-center text-stone-200">
-                        {isBlack ? <p>{formatTime(whiteTime)}</p> : <p>{formatTime(blackTime)}</p>}
-                    </div>
                 </div>
             ) : null}
 
@@ -275,9 +275,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                         <div className="flex flex-col justify-center font-sans text-2xl">
                             <p>{opponent}</p>
                         </div>
-                    </div>
-                    <div className="text-5xl font-mono font-bold text-center text-stone-200">
-                        {isBlack ? <p>{formatTime(blackTime)}</p> : <p>{formatTime(whiteTime)}</p>}
                     </div>
                 </div>
             )

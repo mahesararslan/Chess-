@@ -1,6 +1,9 @@
 import { WebSocket } from "ws";
 import { Game } from "./Games";
-import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { ERROR, GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { PrismaClient } from '../../node-backend/node_modules/prisma/prisma-client'
+
+const prisma = new PrismaClient();
 
 interface User {
     socket: WebSocket;
@@ -90,44 +93,88 @@ export class GameManager {
                     if (user.socket === socket) {
                         return { socket, userId, userName, timeLimit };
                     }
-                    console.log("User ", user); // console 1
+                    
                     return user;
                 });
 
                 // Check if there's a pending user with the same time limit
-                console.log("Checking for pending users with the same time limit: ", this.pendingUsers); // console 2
+                
                 if (this.pendingUsers[timeLimit]) {
                     const pendingUser = this.pendingUsers[timeLimit];
                     if (pendingUser) {
-                        // Create a new game
-                        const game = new Game(pendingUser, { socket, userId, userName}, timeLimit);
-                        this.games.push(game);
 
-                        // Notify both players that the game has started
-                        pendingUser.socket.send(JSON.stringify({
-                            type: INIT_GAME,
-                            payload: {
-                                opponentName: userName,
-                                color: "white"
+                        // make a db call to create a new game
+                        try {
+                            const newGame = await prisma.game.create({
+                                data: {
+                                    whiteId: pendingUser.userId,
+                                    blackId: userId,
+                                    moves: []
+                                }
+                            });
+    
+                            // Create a new game
+                            if(newGame) {
+                                const game = new Game(newGame.id, pendingUser, { socket, userId, userName}, timeLimit);
+                                this.games.push(game);
+        
+                                // Notify both players that the game has started
+                                pendingUser.socket.send(JSON.stringify({
+                                    type: INIT_GAME,
+                                    payload: {
+                                        opponentName: userName,
+                                        color: "white"
+                                    }
+                                }));
+        
+                                socket.send(JSON.stringify({
+                                    type: INIT_GAME,
+                                    payload: {
+                                        opponentName: pendingUser.userName,
+                                        color: "black"
+                                    }
+                                }));
+        
+                                // Clear the pending user for this time limit
+                                this.pendingUsers[timeLimit] = null;
                             }
-                        }));
-
-                        socket.send(JSON.stringify({
-                            type: INIT_GAME,
-                            payload: {
-                                opponentName: pendingUser.userName,
-                                color: "black"
+                            else {
+                                pendingUser.socket.send(JSON.stringify({
+                                    type: ERROR,
+                                    payload: {
+                                        message: "Couldn't create game due to some internal error, please try again!"
+                                    }
+                                }))
+    
+                                socket.send(JSON.stringify({
+                                    type: ERROR,
+                                    payload: {
+                                        message: "Couldn't create game due to some internal error, please try again!"
+                                    }
+                                }))
                             }
-                        }));
+                        }
+                        catch(e) {
+                            console.log(e)
 
-                        // Clear the pending user for this time limit
-                        this.pendingUsers[timeLimit] = null;
+                            pendingUser.socket.send(JSON.stringify({
+                                type: ERROR,
+                                payload: {
+                                    message: "Couldn't create game due to some internal error, please try again!"
+                                }
+                            }))
+
+                            socket.send(JSON.stringify({
+                                type: ERROR,
+                                payload: {
+                                    message: "Couldn't create game due to some internal error, please try again!"
+                                }
+                            }))
+                        }
                     }
                 } else {
-                    console.log("Adding user to pending list because no user with the same time limit was found");
                     // No pending user with the same time limit, add this user to the pending list
                     this.pendingUsers[timeLimit] = { socket, userId, userName, timeLimit };
-                    console.log(this.pendingUsers); // console 2
                 }
             }
 
@@ -139,11 +186,23 @@ export class GameManager {
             }
 
             if (message.type === GAME_OVER) {
+                console.log("Game over message received");
                 const game = this.games.find(game => game.player1.socket === socket || game.player2.socket === socket);
+                console.log("Game found", game);
                 if (game) {
                     game.endGame(socket, message.payload);
                     this.games = this.games.filter(g => g !== game);
                 }
+                if(message.payload.timeOut) {
+                    this.users = this.users.filter(user => user.socket !== socket);
+                    // find game:
+                    const game = this.games.find(game => game.player1.userName === message.payload.winner && game.player2.userName === message.payload.loser) || this.games.find(game => game.player1.userName === message.payload.loser && game.player2.userName === message.payload.winner);
+                    if(game) {
+                        game.endGame(socket, message.payload);
+                        this.games = this.games.filter(g => g !== game);
+                    }
+                }
+                    
             }
         });
     }

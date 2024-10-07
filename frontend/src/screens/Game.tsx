@@ -6,7 +6,9 @@ import { useSocket } from "../hooks/useSocket";
 import { Appbar } from "../components/Appbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { DisconnectedNotification, ErrorNotification, Notification, ResignNotification } from "../components/Notification";
+import { DisconnectedNotification, ErrorNotification, Notification, ResignNotification, TimeoutNotification } from "../components/Notification";
+import TimeSelector from "../components/TimeOptions";
+import ChessClock from "../components/ChessClock";
 
 export const INIT_GAME = "init_game";
 export const MOVE = "move";
@@ -26,11 +28,14 @@ export const Game = () => {
   const [resignMessage, setResignMessage] = useState("");
   const [winner, setWinner] = useState(null); 
   const [gameOver, setGameOver] = useState(false);
+  const [checkmate, setCheckmate] = useState(false);
   const [error, setError] = useState("");
   const [disconnectedMessage, setDisconnectedMessage] = useState("");
   const [whiteTime, setWhiteTime] = useState(300); // Default: 5 minutes
   const [blackTime, setBlackTime] = useState(300); // Default: 5 minutes
   const [timeControl, setTimeControl] = useState(300); // Default to 5 minutes
+  const [timeOut, setTimeOut] = useState(false);
+  const [timeOutMessage, setTimeOutMessage] = useState("");
   
 
   // Fetch the user details
@@ -79,7 +84,7 @@ export const Game = () => {
           setStarted(false);
           setLoader(false);
           setGameOver(true);
-          const { winner, loser, resign, disconnected } = message.payload;
+          const { winner, loser, checkmate, resign, disconnected, timeOut } = message.payload;
 
           if (resign) { // @ts-ignore
             const resigningPlayer = loser === user?.name ? user?.name : opponent;
@@ -88,7 +93,21 @@ export const Game = () => {
             setWinner(winningPlayer);
           }
 
-          if(disconnected) {
+          if(checkmate) {
+            setCheckmate(true); // @ts-ignore
+            setResignMessage(`${winner} wins by checkmate.`); // @ts-ignore
+            const winningPlayer = winner === user?.name ? user?.name : opponent;
+            setWinner(winningPlayer);
+          }
+
+          if(timeOut) {
+            console.log("Timeout reached in frontend");
+            setTimeOut(true);
+            setTimeOutMessage(`${message.payload.winner} wins!\n${message.payload.loser} ran out of time.`);
+            // setGameOver(true);
+          }
+
+          if(!checkmate && !resign && disconnected) {
             setDisconnectedMessage(message.payload.message); // @ts-ignore
             const winningPlayer = disconnected === user?.name ? opponent : user?.name;
             setWinner(winningPlayer);
@@ -101,6 +120,8 @@ export const Game = () => {
       }
     };
   }, [socket, chess, opponent, user]);
+
+  
 
 
   const handleResign = () => { 
@@ -158,25 +179,14 @@ export const Game = () => {
                 
                 {!started && loader && <h1 className="text-2xl text-white">Waiting for opponent...</h1>}
                 {!loader && !started && (
-                  <div className="flex flex-col items-center">
-                  <label htmlFor="time-control" className="text-white text-lg">Select Time Control</label>
-                  <select
-                    id="time-control"
-                    value={timeControl}
-                    onChange={(e) => {
-                      const selectedTime = parseInt(e.target.value);
-                      setTimeControl(selectedTime);
-                      setWhiteTime(selectedTime);
-                      setBlackTime(selectedTime);
-                    }}
-                    className="text-lg bg-stone-800 text-white py-2 px-4 rounded"
-                  >
-                    <option value={60}>1 minute</option>
-                    <option value={180}>3 minutes</option>
-                    <option value={300}>5 minutes</option>
-                  </select>
-                </div>
-                
+                  <TimeSelector onTimeSelect={(time) => {
+                    setTimeControl(time * 10)
+                    setWhiteTime(time * 60)
+                    setBlackTime(time * 60)
+                    
+                  }
+        
+                  } />
                 )}
                 {!loader && !started && (
                   <Button
@@ -197,7 +207,9 @@ export const Game = () => {
                     Play
                   </Button>
                 )}
-
+                {started && ( // @ts-ignore
+                  <ChessClock initialWhiteTime={whiteTime} initialBlackTime={blackTime} isWhiteTurn={chess.turn() === "w"} isBlack={isBlack} userName={user.name} opponent={opponent} />
+                )}
                 {started && (
                   <button
                     onClick={handleResign}
@@ -217,10 +229,13 @@ export const Game = () => {
                 {resignMessage && (
                   <ResignNotification message={resignMessage} visible={resignMessage !== ""} />
                 )}
+                {timeOut && (
+                  <TimeoutNotification visible={timeOut} message={timeOutMessage} />
+                )}
                 {disconnectedMessage && (
                   <DisconnectedNotification message={disconnectedMessage} visible={disconnectedMessage !== ""} />
                 )}
-                {gameOver && !resignMessage && !disconnectedMessage && (
+                {gameOver && !resignMessage && !disconnectedMessage && !timeOut && (
                   <Notification visible={true} winner={winner} />
                 )}
                 {error && <ErrorNotification visible={true} message={error} />}

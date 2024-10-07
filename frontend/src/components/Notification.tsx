@@ -102,6 +102,39 @@ export const Notification = ({visible, winner}: {
     );
   };
 
+  export const TimeoutNotification = ({visible, message}: {
+    visible: boolean;
+    message: string;
+}) => {
+    const [isVisible, setIsVisible] = useState(visible);
+  
+    const closeNotification = () => {
+      setIsVisible(false);
+      window.location.reload();
+    };
+  
+    if (!isVisible) return null;
+  
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="relative bg-white p-6 rounded-lg shadow-lg w-80">
+            <button
+                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                onClick={closeNotification}
+            >
+                &times;
+            </button>
+            <div className="p-6 text-center">
+                    <h2 className="text-2xl font-bold mb-4">Game Over</h2>
+                    <p className="text-xl">
+                        {message}
+                    </p>
+            </div>
+        </div>
+      </div>
+    );
+  };
+
   
   export const ErrorNotification = ({visible, message}: {
     visible: boolean;
