@@ -48,6 +48,25 @@ export default function ChessClock({
       
     }
 
+    if(blackTime === 0) {
+      // @ts-ignore
+      const winner = isBlack === true ? userName : opponent; // @ts-ignore
+      const loser = isBlack === true ? opponent : userName;
+
+      if(socket) {
+        socket.send(
+          JSON.stringify({
+            type: GAME_OVER,
+            payload: {
+              timeOut: true,
+              winner: winner, // @ts-ignore
+              loser: loser,
+            },
+          })
+        )
+      }
+    }
+
 
   }, [whiteTime, blackTime])
 
