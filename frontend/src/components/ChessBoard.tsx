@@ -1,9 +1,7 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MOVE } from "../screens/Game";
 import { Avatar2 } from "./Avatar";
-import { time } from "console";
-import { timeout } from "hono/timeout";
 
 interface Piece {
     square: Square;
@@ -20,8 +18,6 @@ interface ChessBoardProps {
     gameStarted: boolean;
     opponent: string;
     myName: string;
-    timeWhite: number;
-    timeBlack: number;
 }
 
 export const ChessBoard: React.FC<ChessBoardProps> = ({
@@ -33,8 +29,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     gameStarted,
     opponent,
     myName,
-    timeWhite,
-    timeBlack,
 
 }) => {
     const [from, setFrom] = useState<Square | null>(null);
@@ -42,41 +36,12 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
 
-    // Timer states
-    const [whiteTime, setWhiteTime] = useState(timeWhite); // 5 minutes = 300 seconds
-    const [blackTime, setBlackTime] = useState(timeBlack); // 5 minutes = 300 seconds
-    const [isWhiteTurn, setIsWhiteTurn] = useState(chess.turn() === 'w');
-
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;
 
     const isPlayerPiece = (square: Piece | null): boolean => {
         if (!square) return false;
         return isBlack ? square.color === 'b' : square.color === 'w';
-    };
-
-    useEffect(() => {
-
-        updateCheckStatus();
-    
-        const timer = setInterval(() => {
-            if (!gameStarted) return; // Timer should only run when the game starts
-    
-            // Decrease the time based on whose turn it is
-            if (chess.turn() === 'w') {
-                setWhiteTime((prev) => Math.max(prev - 1, 0)); // Decrease white's time
-            } else {
-                setBlackTime((prev) => Math.max(prev - 1, 0)); // Decrease black's time
-            }
-        }, 1000);
-    
-        return () => clearInterval(timer); // Clear interval on unmount
-    }, [chess, gameStarted]);
-
-    const formatTime = (time: number) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
-        return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
     };
 
     const updateCheckStatus = () => {
@@ -149,7 +114,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                     setBoard(chess.board());
                     setFrom(null);
                     setSelectedSquare(null);
-                    setIsWhiteTurn(chess.turn() === 'w'); // Update turn based on the game state
                     updateCheckStatus();
                 } else {
                     console.log("Invalid move attempted");
@@ -191,7 +155,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                 setBoard(chess.board());
                 setFrom(null);
                 setSelectedSquare(null);
-                setIsWhiteTurn(chess.turn() === 'w'); // Update turn based on the game state
                 updateCheckStatus();
             } else {
                 console.log("Invalid move attempted");

@@ -38,6 +38,7 @@ export class GameManager {
 
     removeUser(socket: WebSocket) {
         const disconnectedUser = this.users.find(user => user.socket === socket);
+        const connectedUser = this.users.find(user => user.socket !== socket);
 
         if (disconnectedUser) {
             const game = this.games.find(game =>
@@ -45,7 +46,9 @@ export class GameManager {
             );
 
             if (game) {
+                
                 const opponent = game.player1.socket === socket ? game.player2 : game.player1;
+                game.endGame(socket, { winner: opponent.userName, disconnected: true  });
 
                 opponent.socket.send(JSON.stringify({
                     type: GAME_OVER,

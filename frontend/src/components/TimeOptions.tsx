@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface TimeSelectorProps {
   onTimeSelect: (time: number) => void;
@@ -27,8 +27,8 @@ export default function TimeSelector({ onTimeSelect }: TimeSelectorProps) {
             key={option.value}
             onClick={() => handleTimeSelect(option.value)}
             className={`
-              w-full sm:w-auto px-6 py-3 text-lg font-semibold rounded-lg
-              transition-colors duration-200 ease-in-out
+              w-full sm:w-auto px-4 py-3 text-lg font-semibold rounded-lg
+              transition-colors duration-200 ease-in-out font-mono
               ${
                 selectedTime === option.value
                   ? 'bg-lime-600 text-white'

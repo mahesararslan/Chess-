@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import UserAccountInfo from "../components/UserAccountInfo"
 import axios from "axios";
+import ChessLoader from "../components/Loader";
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -24,7 +25,9 @@ const Profile = () => {
             });
     }, []); 
 
-    if(!user) return <div>Loading...</div>
+    if(!user) return <div>
+        <ChessLoader message="Loading" />
+    </div>
 
     return <div className="h-screen bg-stone-700">
         {/* @ts-ignore */}

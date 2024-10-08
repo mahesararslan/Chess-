@@ -177,7 +177,7 @@ export class Game {
         
     }
 
-    async endGame(socket: WebSocket, payload: { winner?: string; loser?: string; timeOut?: boolean; resign?: boolean }) {
+    async endGame(socket: WebSocket, payload: { winner?: string; loser?: string; timeOut?: boolean; resign?: boolean; disconnected?: boolean; }) {   
         if (payload.resign) {
             const winner = socket === this.player1.socket ? this.player2 : this.player1;
             const loser = socket === this.player1.socket ? this.player1 : this.player2;
@@ -243,6 +243,45 @@ export class Game {
                 type: GAME_OVER,
                 payload
             }));
+    
+            // @ts-ignore
+            console.log("winnerID: ",winner.userId)
+            console.log("moves: ", this.moves);
+
+            // db call
+            try{
+                const updatedGame = await prisma.game.update({
+                    where: {
+                        id: this.id
+                    },
+                    data: { // @ts-ignore
+                        winnerId: winner.userId,
+                        moves: this.moves,
+        
+                    }
+                })
+                console.log("Game Update:", updatedGame)
+
+                // @ts-ignore
+                await this.updatePlayerStats(winner.userId, this.player1.userId, this.player2.userId)
+            }
+            catch(e) {
+                console.log(e);
+                console.log("Error in db call")
+            }
+        }
+
+        if(payload.disconnected) {
+            console.log("Player disconnected")
+            // search for the player who disconnected
+            const winner = payload.winner === this.player1.userName ? this.player1 : this.player2;
+            const loser = payload.winner === this.player1.userName ? this.player2 : this.player1;
+
+            console.log("Winner: ", winner.userName)
+            console.log("Loser: ", loser.userName)
+
+            payload.winner = winner.userName;
+            payload.loser = loser.userName;
     
             // @ts-ignore
             console.log("winnerID: ",winner.userId)

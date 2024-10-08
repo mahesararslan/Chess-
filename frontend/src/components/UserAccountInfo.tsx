@@ -1,4 +1,5 @@
 import { Avatar2 } from './Avatar';
+import { useNavigate } from 'react-router-dom';
 
 interface UserAccountInfoProps {
   name: string;
@@ -17,6 +18,9 @@ export default function UserAccountInfo({
   draws,
   losses
 }: UserAccountInfoProps) {
+
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-stone-700 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden">
@@ -61,6 +65,13 @@ export default function UserAccountInfo({
           <p className="text-center text-gray-600 text-sm">
             Win Rate: {((wins / totalGames) * 100).toFixed(1)}%
           </p>
+        </div>
+        <div className="px-6 text-center text-white text-lg">
+          <button className='bg-stone-800 w-full py-4 rounded-xl mb-3' onClick={() => {
+            navigate('/');
+          }}>
+            Home
+          </button>
         </div>
       </div>
     </div>

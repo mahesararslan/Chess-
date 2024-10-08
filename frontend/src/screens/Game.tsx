@@ -9,6 +9,7 @@ import axios from "axios";
 import { DisconnectedNotification, ErrorNotification, Notification, ResignNotification, TimeoutNotification } from "../components/Notification";
 import TimeSelector from "../components/TimeOptions";
 import ChessClock from "../components/ChessClock";
+import ChessLoader from "../components/Loader";
 
 export const INIT_GAME = "init_game";
 export const MOVE = "move";
@@ -28,7 +29,6 @@ export const Game = () => {
   const [resignMessage, setResignMessage] = useState("");
   const [winner, setWinner] = useState(null); 
   const [gameOver, setGameOver] = useState(false);
-  const [checkmate, setCheckmate] = useState(false);
   const [error, setError] = useState("");
   const [disconnectedMessage, setDisconnectedMessage] = useState("");
   const [whiteTime, setWhiteTime] = useState(300); // Default: 5 minutes
@@ -94,7 +94,6 @@ export const Game = () => {
           }
 
           if(checkmate) {
-            setCheckmate(true); // @ts-ignore
             setResignMessage(`${winner} wins by checkmate.`); // @ts-ignore
             const winningPlayer = winner === user?.name ? user?.name : opponent;
             setWinner(winningPlayer);
@@ -150,9 +149,15 @@ export const Game = () => {
     setBoard(chess.board());
   };
 
-  if (!socket) return <div>Connecting...</div>;
+  if (!socket) return
+      <div>
+        <ChessLoader message="Connecting" />
+      </div>
 
-  if (!user && !opponent) return <div>Loading user data...</div>;
+  if (!user && !opponent) return
+    <div>
+      <ChessLoader message="Loading User Data" />
+    </div>
 
   return (
     <div>
@@ -170,8 +175,6 @@ export const Game = () => {
                 gameStarted={gameStarted}
                 opponent={opponent} // @ts-ignore
                 myName={user?.name}
-                timeWhite={whiteTime}
-                timeBlack={blackTime}
               />
             </div>
             <div className="col-span-2 bg-stone-800 w-full flex flex-col items-center">
@@ -223,7 +226,7 @@ export const Game = () => {
                   onClick={() => navigate("/")}
                   className="mx-5 shadow-lg px-8 py-4 max-w-full text-2xl bg-stone-700 hover:bg-stone-900 text-white font-bold rounded"
                 >
-                  Dashboard
+                  Home
                 </button>
                 )}
                 {resignMessage && (

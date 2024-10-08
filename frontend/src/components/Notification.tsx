@@ -145,6 +145,7 @@ export const Notification = ({visible, winner}: {
   
   useEffect(() => {
     setTimeout(() => {
+      setIsVisible(false)
       navigate("/")
     },4000)
   },[])
