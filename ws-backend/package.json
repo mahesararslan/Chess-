@@ -3,15 +3,25 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "prisma generate",
+    "dev": "ts-node src/index.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "vercel-build": "prisma generate && prisma migrate deploy && tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^5.20.0",
     "@types/ws": "^8.5.12",
     "chess.js": "^1.0.0-beta.8",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "prisma": "^5.20.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "prisma": "^5.20.0"
   }
 }

@@ -1,0 +1,1 @@
+web: cd ws-server && npm start
