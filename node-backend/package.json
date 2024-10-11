@@ -5,32 +5,30 @@
   "scripts": {
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "prisma generate && tsc",
-    "start": "node dist/index.js", 
-    "dev": "ts-node src/index.ts", 
-    "dev:build": "nodemon dist/index.js",
-    "migrate:dev": "prisma migrate dev", 
-    "migrate:prod": "prisma migrate deploy" 
+    "build": "prisma generate && tsc -b",
+    "start": "nodemon dist/index.js",
+    "dev": "nodemon dist/index.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "@prisma/client": "^5.20.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.7",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.7",
-    "nodemon": "^3.1.7",
     "prisma": "^5.20.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "zod": "^3.23.8"
   }
 }
