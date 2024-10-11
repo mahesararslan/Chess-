@@ -4,10 +4,10 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "prisma generate",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "prisma generate && tsc -b",
-    "start": "nodemon dist/index.js",
-    "dev": "nodemon dist/index.js"
+    "dev": "ts-node src/index.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js",
+    "vercel-build": "prisma generate && prisma migrate deploy && tsc"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +32,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "prisma": "^5.20.0"
   }
 }
