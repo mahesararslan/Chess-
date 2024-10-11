@@ -14,7 +14,10 @@ const PORT = 3001;
 const prisma = new PrismaClient();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL, // Allow frontend to access this server
+    credentials: true // Allow cookies or credentials to be sent
+  }));
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
