@@ -17,6 +17,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req: Request, res: Response) => {
+    res.send('Hello World');
+});
+
 app.get('/auth/google', passport.authenticate('google', {
     session: false,
     scope: ['email', 'profile'], 
