@@ -1,1 +1,1 @@
-web: cd ws-server && npm start
+web: cd ws-server && node dist/index.js
