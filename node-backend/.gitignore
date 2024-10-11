@@ -4,3 +4,4 @@ node_modules
 
 # Ignore build output
 dist
+.vercel
