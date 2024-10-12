@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    callbackURL: "http://localhost:3001/auth/google/callback",
+    callbackURL: "https://chess-backend-omega.vercel.app/auth/google/callback",
     passReqToCallback: true
   },
   async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
