@@ -175,6 +175,7 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
             wins: user.wins,
             draws: user.draws,
             losses: user.losses,
+            image: user.image,
         });
     }
     catch (error) {

@@ -95,6 +95,17 @@ export class Game {
             return;
         }
 
+        const opponentSocket = socket === this.player1.socket ? this.player2.socket : this.player1.socket;
+
+        opponentSocket.send(JSON.stringify({
+            type: "move",
+            payload: move
+        }));
+
+        this.currentTurn = socket === this.player1.socket ? this.player2 : this.player1;
+        this.lastMoveTime = new Date();
+
+
         if (this.board.isGameOver()) {
             const winner = this.board.turn() === 'w' ? this.player2 : this.player1;
             const loser = this.board.turn() === 'w' ? this.player1 : this.player2;
@@ -124,15 +135,7 @@ export class Game {
             return;
         }
 
-        const opponentSocket = socket === this.player1.socket ? this.player2.socket : this.player1.socket;
-
-        opponentSocket.send(JSON.stringify({
-            type: "move",
-            payload: move
-        }));
-
-        this.currentTurn = socket === this.player1.socket ? this.player2 : this.player1;
-        this.lastMoveTime = new Date();
+        
     }
     async endGame2(winner: Player, loser: Player, payload: { winner?: string; loser?: string; checkmate:boolean; timeOut?: boolean; resign?: boolean }) {
 

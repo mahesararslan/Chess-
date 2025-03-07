@@ -6,6 +6,7 @@ import { Signin } from './screens/Signin'
 import { Signup } from './screens/Signup'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Profile from './screens/Profile'
+import { GamePage } from './screens/GamePage'
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route element={<ProtectedRoutes />}>
             <Route path='/game' element={<Game />} />
+            <Route path='/select-game' element={<GamePage />} />
             <Route path='/profile' element={<Profile />} />
           </Route>
           <Route path='/' element={<Landing />} />

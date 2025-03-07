@@ -22,6 +22,7 @@ model User {
   wins Int?     @default(0)
   losses Int?   @default(0)
   draws Int?    @default(0)
+  image    String?
 
   white     Game[] @relation("white")
   black     Game[] @relation("black")

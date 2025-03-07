@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    callbackURL: "https://chess-backend-omega.vercel.app/auth/google/callback",
+    callbackURL: "http://localhost:3001/auth/google/callback",
     passReqToCallback: true
   },
   async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
@@ -27,11 +27,14 @@ passport.use(new GoogleStrategy({
             data: {
               email: profile.email,
               name: profile.displayName,
+              image: profile.picture,
               // Additional fields can be set here as needed
             },
           });
+          console.log("User created", user);
+          
         } 
-        
+        console.log("User already created", user);
         
         const token = jwt.sign({ id: user.id, email:user.email }, process.env.JWT_SECRET)
 

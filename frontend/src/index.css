@@ -1,3 +1,229 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 17, 24, 39;
+  --background-end-rgb: 31, 41, 55;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes subtleFloat {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(3px) rotate(-0.5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-subtle-float {
+  animation: subtleFloat 4s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2s ease-in-out infinite;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* Container utility */
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* Amber and gray colors */
+.text-amber-400 {
+  color: #fbbf24;
+}
+
+.bg-amber-500 {
+  background-color: #f59e0b;
+}
+
+.bg-amber-600 {
+  background-color: #d97706;
+}
+
+.hover\:bg-amber-600:hover {
+  background-color: #d97706;
+}
+
+.from-amber-600 {
+  --tw-gradient-from: #d97706;
+}
+
+.to-amber-500 {
+  --tw-gradient-to: #f59e0b;
+}
+
+.text-gray-300 {
+  color: #d1d5db;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.bg-gray-700\/50 {
+  background-color: rgba(55, 65, 81, 0.5);
+}
+
+.bg-gray-800\/50 {
+  background-color: rgba(31, 41, 55, 0.5);
+}
+
+.from-gray-900 {
+  --tw-gradient-from: #111827;
+}
+
+.to-gray-800 {
+  --tw-gradient-to: #1f2937;
+}
+
+.border-gray-600 {
+  border-color: #4b5563;
+}
+
+.hover\:bg-gray-700:hover {
+  background-color: #374151;
+}
+
+.bg-gray-900 {
+  background-color: #111827;
+}
+
+.bg-gray-900\/95 {
+  background-color: rgba(17, 24, 39, 0.95);
+}
+
+.bg-gray-800 {
+  background-color: #1f2937;
+}
+
+.bg-gray-700 {
+  background-color: #374151;
+}
+
+.bg-gray-600 {
+  background-color: #4b5563;
+}
+
+.hover\:bg-gray-600:hover {
+  background-color: #4b5563;
+}
+
