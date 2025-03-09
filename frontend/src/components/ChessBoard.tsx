@@ -1,7 +1,6 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useState } from "react";
-import { MOVE } from "../screens/Game";
-import { Avatar2 } from "./Avatar";
+import { MOVE } from "../utils/messages";
 
 interface Piece {
     square: Square;
@@ -16,8 +15,6 @@ interface ChessBoardProps {
     setBoard: React.Dispatch<React.SetStateAction<(Piece | null)[][]>>;
     isBlack: boolean;
     gameStarted: boolean;
-    opponent: string;
-    myName: string;
 }
 
 export const ChessBoard: React.FC<ChessBoardProps> = ({
@@ -27,8 +24,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     setBoard,
     isBlack,
     gameStarted,
-    opponent,
-    myName,
 
 }) => {
     const [from, setFrom] = useState<Square | null>(null);
@@ -178,16 +173,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
     return (
         <div className="text-white-200 rounded-lg">
-            {opponent && gameStarted ? (
-                <div className="flex justify-between mb-2">
-                    <div className="flex gap-2 text-white font-bold text-lg">
-                        <Avatar2 name={myName} size="small" />
-                        <div className="flex flex-col justify-center font-sans text-2xl">
-                            <p>{myName}</p>
-                        </div>
-                    </div>
-                </div>
-            ) : null}
+
 
             {displayBoard.map((row, i) => {
                 const displayRow = isBlack ? [...row].reverse() : row;
@@ -231,17 +217,6 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                     </div>
                 );
             })}
-            {opponent && gameStarted ? (
-                <div className="flex justify-between mt-2">
-                    <div className="flex gap-2 text-white font-bold text-lg">
-                        <Avatar2 name={opponent} size="small" />
-                        <div className="flex flex-col justify-center font-sans text-2xl">
-                            <p>{opponent}</p>
-                        </div>
-                    </div>
-                </div>
-            )
-            : null}
         </div>
     );
 };

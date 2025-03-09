@@ -7,8 +7,8 @@
   },
   "scripts": {
     "postinstall": "prisma generate",
-    "dev": "ts-node src/index.ts",
-    "build": "prisma generate && tsc",
+    "dev": "nodemon --config nodemon.json",
+    "build": "tsc",
     "start": "node dist/index.js",
     "vercel-build": "prisma generate && prisma migrate deploy && tsc"
   },
@@ -21,11 +21,13 @@
     "@types/node": "^14.14.31",
     "@types/ws": "^8.5.12",
     "chess.js": "^1.0.0-beta.8",
-    "ws": "^8.18.0",
-    "prisma": "^5.20.0"
+    "prisma": "^5.20.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.3",
-    "prisma": "^5.20.0"
+    "nodemon": "^3.1.9",
+    "prisma": "^5.20.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }

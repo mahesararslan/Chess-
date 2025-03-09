@@ -1,47 +1,3 @@
-// import { useLocation, useNavigate } from "react-router-dom"
-// import { Button } from "../components/Button";
-// import { Appbar } from "../components/Appbar";
-// import { useEffect } from "react";
-
-// export const Landing = () => {
-//     const navigate = useNavigate();
-//     // get token from url
-//     const query = new URLSearchParams(useLocation().search);
-//     const token = query.get("token");
-
-//     useEffect(() => { 
-//         console.log("token", token)
-//         if(token) {
-//             localStorage.setItem("token", token || "");
-//         }
-        
-//     })
-
-//     return <div className="flex flex-col items-center bg-stone-800 h-screen">
-//         <Appbar />
-//         <div className="pt-8 max-w-screen-lg">
-//             <div className="grid grid-cols-1 md:gap-10 md:grid-cols-2 ">
-//                 <div className="p-5 flex justify-center bg-stone-800">
-//                     <img src={"/chessboard.png"} className="md:max-w-96 shadow-lg" />
-//                 </div>
-//                 <div className="md:pt-16">
-//                     <div className="flex justify-center">
-//                         <h1 className="text-4xl font-bold text-white">Play chess online!</h1>
-//                     </div>
-//                     <div className="mb-5 md:mb-0 mt-8 flex justify-center">
-//                         <Button onClick={() => {
-//                             navigate("/game")
-
-//                         }} >
-//                             Play Online
-//                         </Button>
-//                     </div>    
-//                 </div>
-//             </div>
-//         </div>
-//     </div>
-
-// }
 import { ArrowRight, Award, Clock, Users } from "lucide-react"
 import Navbar from "../components/Navbar"
 import "../index.css"
@@ -89,20 +45,23 @@ export function Landing() {
               <div className="pt-4 flex flex-wrap gap-4 justify-center md:justify-start animate-fade-in-up animation-delay-400">
                 <button className="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
                     onClick={() => {
-                        navigate("/select-game")
+                        navigate("/game-online")
                     }}
                 >
                   Play Online <ArrowRight className="h-5 w-5" />
                 </button>
-                <button className="px-8 py-3 bg-transparent hover:bg-white/10 border border-white/30 rounded-lg transition-all duration-300">
-                  Learn to Play
+                <button className="px-8 py-3 bg-transparent hover:bg-white/10 border border-white/30 rounded-lg transition-all duration-300"
+                  onClick={() => {
+                    navigate("/game-bot")
+                  }}>
+                  Play vs BOT
                 </button>
               </div>
             </div>
 
             <div className="flex-1 animate-float">
               <div className="relative w-full max-w-md mx-auto">
-                <div className="absolute inset-0 bg-amber-500/20 rounded-2xl blur-xl transform -rotate-6"></div>
+                <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-xl transform -rotate-6"></div>
                 <img
                   src="./chessboard.png"
                   alt="Chess board"
@@ -161,7 +120,11 @@ export function Landing() {
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Join thousands of chess enthusiasts and start your journey today.
           </p>
-          <button className="px-8 py-3 hover:bg-white/30 bg-white/20 border border-white/30 rounded-lg transition-all duration-300 hover:scale-105">
+          <button className="px-8 py-3 hover:bg-white/30 bg-white/20 border border-white/30 rounded-lg transition-all duration-300 hover:scale-105"
+            onClick={() => {
+              navigate("/signin")
+            }}
+          >
             Create Free Account
           </button>
         </div>

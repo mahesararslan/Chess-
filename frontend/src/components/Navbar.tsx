@@ -79,8 +79,11 @@ function Navbar() {
             <a href="/" className="text-gray-300 hover:text-white transition-colors">
               Home
             </a>
-            <a href="/select-game" className="text-gray-300 hover:text-white transition-colors">
+            <a href="/game-online" className="text-gray-300 hover:text-white transition-colors">
               Play
+            </a>
+            <a href="/game-bot" className="text-gray-300 hover:text-white transition-colors">
+              Learn
             </a>
             <a href="#" className="text-gray-300 hover:text-white transition-colors">
               Community
@@ -120,30 +123,13 @@ function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
+          <div className="md:hidden flex gap-3">
           <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-gray-800 shadow-lg">
-          <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <a href="#" className="text-white py-2 block">
-              Home
-            </a>
-            <a href="#" className="text-white py-2 block">
-              Play
-            </a>
-            <a href="#" className="text-white py-2 block">
-              Community
-            </a>
-
-            {/* Auth Section */}
-            {user ? (
-              <div className="flex items-center py-2">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-amber-500 flex items-center justify-center text-white font-bold mr-3">
+          {user && (
+              <div className="md:hidden flex items-center py-2">
+                <div className="w-7 h-7 rounded-full overflow-hidden bg-amber-500 flex items-center justify-center text-white font-bold ">
                   {user.image ? (
                     <img
                       src={user.image || "/placeholder.svg"}
@@ -154,19 +140,42 @@ function Navbar() {
                     getInitial(user.name)
                   )}
                 </div>
-                <span className="text-white">{user.name}</span>
               </div>
-            ) : (
-              <button className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded transition-colors">
-                Sign In
-              </button>
-            )}
-            {user && (
+            )} 
+            </div> 
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-gray-800 shadow-lg">
+          <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+            <a href="/" className="text-white py-2 block">
+              Home
+            </a>
+            <a href="/game-online" className="text-white py-2 block">
+              Play
+            </a>
+            <a href="/game-bot" className="text-white py-2 block">
+              Learn
+            </a>
+            <a href="#" className="text-white py-2 block">
+              Community
+            </a>
+
+            {/* Auth Section */}
+            {user ? (
               <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded transition-colors"
                 onClick={handleLogout}
               >
                 Sign Out
               </button>
+            ): (
+                <button className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded transition-colors"
+                  onClick={() => navigate("/signin")}
+                >
+                  Sign In
+                </button>
             )}
           </div>
         </div>

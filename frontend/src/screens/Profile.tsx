@@ -19,7 +19,6 @@ const Profile = () => {
             })
             .then((response) => {
                 setUser(response.data);
-                console.log("User", user);
             }).catch((error) => {
                 console.error("Error fetching user:", error);
             });

@@ -81,6 +81,7 @@ export class GameManager {
 
                 // Check if the user is already in another game from a different socket
                 const isUserInGame = this.users.some(user => user.userId === userId && user.socket !== socket);
+                
                 if (isUserInGame) {
                     socket.send(JSON.stringify({
                         type: "error",
@@ -105,7 +106,8 @@ export class GameManager {
                 if (this.pendingUsers[timeLimit]) {
                     const pendingUser = this.pendingUsers[timeLimit];
                     if (pendingUser) {
-
+                        console.log("Pending user found", pendingUser);
+                        console.log("Current user", { socket, userId, userName });
                         // make a db call to create a new game
                         try {
                             const newGame = await prisma.game.create({
@@ -121,23 +123,7 @@ export class GameManager {
                                 const game = new Game(newGame.id, pendingUser, { socket, userId, userName}, timeLimit);
                                 this.games.push(game);
         
-                                // Notify both players that the game has started
-                                pendingUser.socket.send(JSON.stringify({
-                                    type: INIT_GAME,
-                                    payload: {
-                                        opponentName: userName,
-                                        color: "white"
-                                    }
-                                }));
-        
-                                socket.send(JSON.stringify({
-                                    type: INIT_GAME,
-                                    payload: {
-                                        opponentName: pendingUser.userName,
-                                        color: "black"
-                                    }
-                                }));
-        
+                                
                                 // Clear the pending user for this time limit
                                 this.pendingUsers[timeLimit] = null;
                             }

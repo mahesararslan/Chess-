@@ -140,6 +140,7 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
         // @ts-ignore
         req.userId = decoded.id; // @ts-ignore
+        next();
     
     } catch (error) {
         return res.status(401).json({
@@ -147,7 +148,7 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
         });
     }
 
-    next();
+    
 };
 
 
@@ -175,7 +176,7 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
             wins: user.wins,
             draws: user.draws,
             losses: user.losses,
-            image: user.image,
+            image: user?.image,
         });
     }
     catch (error) {
@@ -185,6 +186,54 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
         });
     }
 })
+
+// @ts-ignore
+app.get('/get-game/:id', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const gameId = req.params.id;
+
+        const game = await prisma.game.findUnique({
+            where: {
+                id: gameId,
+            }
+        });
+
+        if (!game) {
+            return res.status(404).json({
+                message: 'Game not found',
+            });
+        }
+
+        return res.status(200).json({
+            game,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+        });
+    }
+});
+
+// @ts-ignore
+app.get('/get-opponent/:id', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const oppId = req.params.id;
+
+        const opponent = await prisma.user.findUnique({
+            where: {
+                id: oppId,
+            }
+        });
+
+        return res.status(200).json({
+            opponent
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+        });
+    }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

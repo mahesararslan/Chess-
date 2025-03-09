@@ -40,7 +40,7 @@ export class Game {
             type: INIT_GAME,
             payload: {
                 color: "white",
-                opponentName: player2.userName
+                opponent: player2.userId
             }
         }));
 
@@ -48,7 +48,7 @@ export class Game {
             type: INIT_GAME,
             payload: {
                 color: "black",
-                opponentName: player1.userName
+                opponent: player1.userId
             }
         }));
     }
@@ -273,6 +273,7 @@ export class Game {
                 console.log("Error in db call")
             }
         }
+
 
         if(payload.disconnected) {
             console.log("Player disconnected")
