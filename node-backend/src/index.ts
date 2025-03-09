@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import cors from 'cors'; 
+import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import { signinSchema, signupSchema } from './zodTypes';
 import bcrypt from 'bcrypt';
@@ -25,14 +25,14 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/auth/google', passport.authenticate('google', {
     session: false,
-    scope: ['email', 'profile'], 
+    scope: ['email', 'profile'],
 }));
 
-app.get('/auth/google/callback', passport.authenticate('google',{
+app.get('/auth/google/callback', passport.authenticate('google', {
     session: false,
     failureRedirect: `${process.env.FRONTEND_URL}/signin`,
 }), function (req, res) { // @ts-ignore
-    const token = req.user.token; 
+    const token = req.user.token;
     res.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
 });
 
@@ -62,7 +62,7 @@ app.post('/signup', async (req, res: any) => {
             }
         });
 
-        const token = jwt.sign({ id: user}, process.env.JWT_SECRET || "");
+        const token = jwt.sign({ id: user }, process.env.JWT_SECRET || "");
 
 
         return res.status(201).json({
@@ -79,7 +79,7 @@ app.post('/signup', async (req, res: any) => {
 app.post('/signin', async (req: Request, res: any) => {
     const { username, password } = req.body;
 
-    const { success } = signinSchema.safeParse({ username, password }); 
+    const { success } = signinSchema.safeParse({ username, password });
 
     if (!success) {
         return res.status(400).json({
@@ -87,7 +87,7 @@ app.post('/signin', async (req: Request, res: any) => {
         });
     }
 
-   try {
+    try {
         const user = await prisma.user.findUnique({
             where: {
                 email: username,
@@ -115,7 +115,7 @@ app.post('/signin', async (req: Request, res: any) => {
             token: token,
             message: 'Signin successful'
         });
-   }
+    }
     catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -134,40 +134,40 @@ const authMiddleware = async (req: Request, res: Response, next: any) => {
     }
 
     const token = authHeader.split(' ')[1];
-    
+
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
         // @ts-ignore
         req.userId = decoded.id; // @ts-ignore
         next();
-    
+
     } catch (error) {
         return res.status(401).json({
             message: 'Invalid token',
         });
     }
 
-    
+
 };
 
 
 // @ts-ignore
 app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
     try { // @ts-ignore
-        
+
         const user = await prisma.user.findUnique({
             where: { // @ts-ignore
                 id: req.userId
             }
         });
-    
+
         if (!user) {
             return res.status(401).json({
                 message: 'User not found',
             });
         }
-    
+
         return res.status(200).json({
             name: user.name,
             username: user.email,
@@ -186,6 +186,112 @@ app.get('/get-user', authMiddleware, async (req: Request, res: Response) => {
         });
     }
 })
+
+// @ts-ignore
+app.get('/get-user-data', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      const user = await prisma.user.findUnique({ // @ts-ignore
+        where: { id: req.userId },
+        include: {
+          white: {
+            include: { white: true, black: true, winner: true },
+            orderBy: { createdAt: 'asc' },
+          },
+          black: {
+            include: { white: true, black: true, winner: true },
+            orderBy: { createdAt: 'asc' },
+          },
+        },
+      });
+  
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+  
+      // Combine and sort games chronologically
+      const games = [...user.white, ...user.black].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+      );
+  
+      let tempWins = 0;
+      let tempLosses = 0;
+      let tempDraws = 0;
+  
+      const recentGames = games.map((game) => {
+        // Calculate rating BEFORE this game by using stats so far
+        const rating =
+          1000 + tempWins * 10 - tempLosses * 5 + tempDraws * 2;
+  
+        // Opponent details
+        const opponent =
+          game.whiteId === user.id
+            ? game.black.name || 'Unknown'
+            : game.white.name || 'Unknown';
+  
+        // Result calculation
+        const result =
+          game.winnerId === user.id
+            ? 'win'
+            : game.winnerId
+              ? 'loss'
+              : 'draw';
+  
+        // Date calculation
+        const dateDiff = Math.round(
+          (new Date().getTime() - game.createdAt.getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+  
+        // Update stats **after** recording this game
+        if (game.winnerId === user.id) {
+          tempWins++;
+        } else if (game.winnerId) {
+          tempLosses++;
+        } else {
+          tempDraws++;
+        }
+  
+        return {
+          opponent,
+          result,
+          rating, // Historical rating before this game
+          date: dateDiff === 0 ? 'Today' : `${dateDiff} day(s) ago`,
+        };
+      });
+  
+      // Take last 5 games
+      const last5Games = recentGames.slice(-5).reverse();
+  
+      // Final rating based on total stats
+      const currentRating =
+        1000 + tempWins * 10 - tempLosses * 5 + tempDraws * 2;
+  
+      return res.status(200).json({
+        id: user.id,
+        username: user.email,
+        name: user.name,
+        image: user.image,
+        joinDate: user.createdAt.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        }),
+        rating: currentRating,
+        stats: {
+          wins: tempWins,
+          draws: tempDraws,
+          losses: tempLosses,
+          totalGames: tempWins + tempLosses + tempDraws,
+        },
+        recentGames: last5Games,
+      });
+    } catch (error) {
+      return res.status(500).json({ // @ts-ignore
+        error: error.message,
+        message: 'Internal server error',
+      });
+    }
+  });
+  
 
 // @ts-ignore
 app.get('/get-game/:id', authMiddleware, async (req: Request, res: Response) => {
@@ -236,5 +342,5 @@ app.get('/get-opponent/:id', authMiddleware, async (req: Request, res: Response)
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

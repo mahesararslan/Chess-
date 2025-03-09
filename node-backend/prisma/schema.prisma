@@ -23,6 +23,7 @@ model User {
   losses Int?   @default(0)
   draws Int?    @default(0)
   image    String?
+  createdAt DateTime @default(now())
 
   white     Game[] @relation("white")
   black     Game[] @relation("black")

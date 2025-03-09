@@ -5,9 +5,9 @@ import Popup from "../components/Popup";
 import { Loader2 } from "lucide-react";
 import PlayerInfo from "../components/PlayerInfo";
 import axios from "axios";
-import ChessClock from "../components/ChessClock";
+import { ChessClockBot } from "../components/ChessClock";
 
-const BotGame = ({difficulty="medium"}: {difficulty: string}) => {
+const BotGame = () => {
     const [chess, setChess] = useState(new Chess());
     const [board, setBoard] = useState(chess.board());
     const [selectedTime, setSelectedTime] = useState(5) // Default to 5 minutes
@@ -18,7 +18,7 @@ const BotGame = ({difficulty="medium"}: {difficulty: string}) => {
     const [currentPlayer, setCurrentPlayer] = useState(null)
     const [opponent, setOpponent] = useState(null)
     const [gameState, setGameState] = useState("setup")
-    const [difficultyLevel, setDifficulyLevel] = useState("medium")
+    const [difficulty, setDifficuly] = useState("medium")
     const timeOptions = [3, 5, 10];
     const isBlack = false;
 
@@ -141,7 +141,7 @@ const BotGame = ({difficulty="medium"}: {difficulty: string}) => {
                         {["easy", "medium", "hard"].map((level) => (
                             <button
                             key={level}
-                            onClick={() => setDifficulyLevel(level)}
+                            onClick={() => setDifficuly(level)}
                             className={`py-3 px-4 rounded-lg transition-all duration-300 ${
                                 difficulty === level
                                 ? "bg-amber-500 hover:bg-amber-400 text-white font-bold shadow-lg scale-105"
@@ -177,7 +177,19 @@ const BotGame = ({difficulty="medium"}: {difficulty: string}) => {
                         </div>
 
                         {/* @ts-ignore */}
-                        <ChessClock initialTime={selectedTime} isWhiteTurn={chess.turn() === "w"} isRunning={gameState === "playing"} isBlack={isBlack} userName={user?.name} opponent={opponent?.name} />
+                        <ChessClockBot initialTime={selectedTime} isWhiteTurn={chess.turn() === "w"} isRunning={gameState === "playing"} isBlack={isBlack} userName={user?.name} opponent={opponent?.name} />
+                        {gameState === "gameOver" && (
+                            
+                            <div className="flex flex-col gap-4">
+                                <h2 className="text-xl font-semibold">Game Over</h2>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="py-3 px-4 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-lg transition-all duration-300"
+                                >
+                                    New Game
+                                </button>
+                            </div>
+                        )}
 
                         
                     </div>
@@ -190,6 +202,7 @@ const BotGame = ({difficulty="medium"}: {difficulty: string}) => {
                         setBoard={setBoard}
                         isBlack={false}
                         onPlayerMove={() => makeBotMove()}
+                        setGameState={setGameState}
                     />
                     </div>
                     </div>
@@ -224,6 +237,7 @@ interface ChessBoardProps {
     setBoard: React.Dispatch<React.SetStateAction<(Piece | null)[][]>>;
     isBlack: boolean;
     onPlayerMove: (move: { from: Square; to: Square }) => void;
+    setGameState: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
@@ -232,6 +246,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     setBoard,
     isBlack,
     onPlayerMove,
+    setGameState
 }) => {
     const [from, setFrom] = useState<Square | null>(null);
         const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
@@ -271,6 +286,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                 // who won?
                 chess.turn() === 'w' ? setPopupData({ title: "Game Over", message: "It's a checkmate, You Won!" }) :
                 setPopupData({ title: "Game Over", message: "It's a checkmate, You Lost!" });
+                setGameState("gameOver");
             }
         };
     

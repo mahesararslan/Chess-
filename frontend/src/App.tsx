@@ -16,9 +16,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<ProtectedRoutes />}>
-            <Route path='/game-bot' element={<BotGamePage difficulty='medium'/>} />
+            <Route path='/game-bot' element={<BotGamePage />} />
             <Route path='/game-online' element={<GamePage />} />
             <Route path='/profile' element={<Profile />} />
+            <Route path='/account/:id' element={<Profile />} />
           </Route>
           <Route path='/' element={<Landing />} />
           
