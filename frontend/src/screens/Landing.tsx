@@ -74,7 +74,7 @@ export function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-800/50">
+      <section className="py-20 bg-gray-800/50" id="features">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
             Why Choose Our <span className="text-amber-400">Chess Platform</span>

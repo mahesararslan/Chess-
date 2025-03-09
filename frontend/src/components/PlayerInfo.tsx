@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 // @ts-ignore
 function PlayerInfo({ player, isActive }) {
     console.log("PLAYER INFO COMPONENT: ",player)
@@ -16,6 +18,8 @@ function PlayerInfo({ player, isActive }) {
           isActive ? "bg-amber-600/20 border border-amber-500/50" : "bg-gray-800/50"
         }`}
       >
+        <Link to={player?.id ? `/account/${player.id}`: ""} target={player?.id ? "_blank" : ""}
+  rel="noopener noreferrer">
         <div
           className={`w-10 h-10 rounded-full overflow-hidden ${
             isActive ? "bg-amber-500" : "bg-gray-700"
@@ -29,6 +33,7 @@ function PlayerInfo({ player, isActive }) {
             getInitial(player.name)
           )}
         </div>
+        </Link>
         <div>
           <div className="font-medium">{player.name}</div>
           <div className="text-xs text-gray-400">{player.rating ? `Rating: ${player.rating}` : "Unrated"}</div>

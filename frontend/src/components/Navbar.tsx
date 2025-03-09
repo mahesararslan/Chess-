@@ -85,7 +85,7 @@ function Navbar() {
             <a href="/game-bot" className="text-gray-300 hover:text-white transition-colors">
               Learn
             </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            <a href="#features" className="text-gray-300 hover:text-white transition-colors">
               Community
             </a>
             {user && (
@@ -159,7 +159,7 @@ function Navbar() {
             <a href="/game-bot" className="text-white py-2 block">
               Learn
             </a>
-            <a href="#" className="text-white py-2 block">
+            <a href="#features" className="text-white py-2 block">
               Community
             </a>
 

@@ -291,6 +291,113 @@ app.get('/get-user-data', authMiddleware, async (req: Request, res: Response) =>
       });
     }
   });
+
+  
+// @ts-ignore
+app.get('/get-account-data/:id', authMiddleware, async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    try {
+      const user = await prisma.user.findUnique({ // @ts-ignore
+        where: { id: userId },
+        include: {
+          white: {
+            include: { white: true, black: true, winner: true },
+            orderBy: { createdAt: 'asc' },
+          },
+          black: {
+            include: { white: true, black: true, winner: true },
+            orderBy: { createdAt: 'asc' },
+          },
+        },
+      });
+  
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+  
+      // Combine and sort games chronologically
+      const games = [...user.white, ...user.black].sort(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+      );
+  
+      let tempWins = 0;
+      let tempLosses = 0;
+      let tempDraws = 0;
+  
+      const recentGames = games.map((game) => {
+        // Calculate rating BEFORE this game by using stats so far
+        const rating =
+          1000 + tempWins * 10 - tempLosses * 5 + tempDraws * 2;
+  
+        // Opponent details
+        const opponent =
+          game.whiteId === user.id
+            ? game.black.name || 'Unknown'
+            : game.white.name || 'Unknown';
+  
+        // Result calculation
+        const result =
+          game.winnerId === user.id
+            ? 'win'
+            : game.winnerId
+              ? 'loss'
+              : 'draw';
+  
+        // Date calculation
+        const dateDiff = Math.round(
+          (new Date().getTime() - game.createdAt.getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+  
+        // Update stats **after** recording this game
+        if (game.winnerId === user.id) {
+          tempWins++;
+        } else if (game.winnerId) {
+          tempLosses++;
+        } else {
+          tempDraws++;
+        }
+  
+        return {
+          opponent,
+          result,
+          rating, // Historical rating before this game
+          date: dateDiff === 0 ? 'Today' : `${dateDiff} day(s) ago`,
+        };
+      });
+  
+      // Take last 5 games
+      const last5Games = recentGames.slice(-5).reverse();
+  
+      // Final rating based on total stats
+      const currentRating =
+        1000 + tempWins * 10 - tempLosses * 5 + tempDraws * 2;
+  
+      return res.status(200).json({
+        id: user.id,
+        username: user.email,
+        name: user.name,
+        image: user.image,
+        joinDate: user.createdAt.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        }),
+        rating: currentRating,
+        stats: {
+          wins: tempWins,
+          draws: tempDraws,
+          losses: tempLosses,
+          totalGames: tempWins + tempLosses + tempDraws,
+        },
+        recentGames: last5Games,
+      });
+    } catch (error) {
+      return res.status(500).json({ // @ts-ignore
+        error: error.message,
+        message: 'Internal server error',
+      });
+    }
+  });
   
 
 // @ts-ignore
