@@ -100,7 +100,7 @@ function ProfilePage() {
                   {userData?.image ? (
                     <img
                       src={userData.image || "/placeholder.svg"}
-                      alt={userData.name}
+                      alt={userData.name[0]}
                       className="w-full h-full object-cover"
                     />
                   ) : (

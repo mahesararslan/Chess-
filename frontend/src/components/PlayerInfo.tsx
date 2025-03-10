@@ -28,7 +28,7 @@ function PlayerInfo({ player, isActive }) {
           }`}
         >
           {player.image ? (
-            <img src={player.image || "/placeholder.svg"} alt={player.name} className="w-full h-full object-cover" />
+            <img src={player.image || "/placeholder.svg"} alt={player.name[0]} className="w-full h-full object-cover" />
           ) : (
             getInitial(player.name)
           )}

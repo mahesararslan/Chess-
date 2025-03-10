@@ -100,17 +100,17 @@ function Navbar() {
             {user ? (
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-amber-500 flex items-center justify-center text-white font-bold">
+                <Link to="/profile">
                   {user.image ? (
-                    <Link to="/profile">
                     <img
                       src={user.image || "/placeholder.svg"}
                       alt={user.name}
                       className="w-full h-full object-cover"
                     />
-                    </Link>
                   ) : (
                     getInitial(user.name)
                   )}
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -127,13 +127,14 @@ function Navbar() {
           <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
+          <Link to="/profile">
           {user && (
               <div className="md:hidden flex items-center py-2">
                 <div className="w-7 h-7 rounded-full overflow-hidden bg-amber-500 flex items-center justify-center text-white font-bold ">
                   {user.image ? (
                     <img
                       src={user.image || "/placeholder.svg"}
-                      alt={user.name}
+                      alt={user.name[0]}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -142,6 +143,7 @@ function Navbar() {
                 </div>
               </div>
             )} 
+            </Link> 
             </div> 
         </div>
       </div>
