@@ -249,18 +249,8 @@ function ChessClock({ initialTime, isWhiteTurn, isRunning, isBlack, opponent, us
 export default ChessClock
 
 
-interface ChessClockBotProps {
-  initialTime: number
-  isWhiteTurn: boolean
-  isRunning: boolean
-  isBlack: boolean
-  opponent: string
-  userName: string
-  setGameState: React.Dispatch<React.SetStateAction<string>>;
-}
 
 export function ChessClockBot({ initialTime, isWhiteTurn, isRunning, isBlack, opponent, userName }: ChessClockProps) {
-  const socket = useSocket()
   // Convert minutes to milliseconds
   const initialTimeMs = initialTime * 60 * 1000
 

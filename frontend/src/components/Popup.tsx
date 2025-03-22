@@ -1,5 +1,4 @@
 import { X } from "lucide-react"
-import { useNavigate } from "react-router-dom"
 
 interface PopupProps {
     title: string
@@ -8,7 +7,6 @@ interface PopupProps {
 }
 
 function Popup({ title, message, onClose }: PopupProps) {
-  const navigate = useNavigate()
 
   const handleNewGame = () => {
     onClose()

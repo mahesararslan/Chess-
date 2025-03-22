@@ -32,7 +32,7 @@ function SignUpPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(signUpSchema),
     defaultValues: {

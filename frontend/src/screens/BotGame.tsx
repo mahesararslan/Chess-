@@ -7,15 +7,14 @@ import axios from "axios";
 import { ChessClockBot } from "../components/ChessClock";
 
 const BotGame = () => {
-    const [chess, setChess] = useState(new Chess());
+    const [chess] = useState(new Chess());
     const [board, setBoard] = useState(chess.board());
     const [selectedTime, setSelectedTime] = useState(5) // Default to 5 minutes
-    const [isSearching, setIsSearching] = useState(false)
+    
     const [animateBoard, setAnimateBoard] = useState(false)
-    const loadingTextRef = useRef(null)
     const [user, setUser] = useState(null)
     const [currentPlayer, setCurrentPlayer] = useState(null)
-    const [opponent, setOpponent] = useState(null)
+    const [opponent] = useState(null)
     const [gameState, setGameState] = useState("setup")
     const [difficulty, setDifficuly] = useState("medium")
     const timeOptions = [3, 5, 10];
@@ -63,7 +62,6 @@ const BotGame = () => {
     const handleStartGame = () => {
         setAnimateBoard(true);
         setGameState("playing");
-        setIsSearching(true); // @ts-ignore
         
     };
 

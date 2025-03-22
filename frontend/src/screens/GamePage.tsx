@@ -13,7 +13,7 @@ import Popup from "../components/Popup"
 
 export function GamePage() {
     const socket = useSocket();
-    const [chess, setChess] = useState(new Chess());
+    const [chess] = useState(new Chess());
     const [board, setBoard] = useState(chess.board());
     const [selectedTime, setSelectedTime] = useState(5) // Default to 5 minutes
     const [isSearching, setIsSearching] = useState(false)
