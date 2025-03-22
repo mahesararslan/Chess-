@@ -2,7 +2,6 @@ import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import Popup from "../components/Popup";
-import { Loader2 } from "lucide-react";
 import PlayerInfo from "../components/PlayerInfo";
 import axios from "axios";
 import { ChessClockBot } from "../components/ChessClock";

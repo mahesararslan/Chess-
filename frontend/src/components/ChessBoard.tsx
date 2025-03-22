@@ -30,7 +30,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
-    const moveSound = useRef(new Audio('/move.mp3'));
+    const moveSound = useRef(new Audio('/move.wav'));
 
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;

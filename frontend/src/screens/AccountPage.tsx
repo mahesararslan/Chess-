@@ -52,7 +52,8 @@ function Account() {
                 .then((response) => {
                     setUserData(response.data);
                     setTotalGames(response.data.stats.totalGames)
-                    setWinPercentage(response.data.stats.wins / response.data.stats.totalGames * 100)
+                    const winPercentage = (response.data.stats.wins / response.data.stats.totalGames) * 100;
+                    setWinPercentage(Number(winPercentage.toFixed(2)));
                     setLoading(false)
                 }).catch((error) => {
                     console.error("Error fetching user:", error);
