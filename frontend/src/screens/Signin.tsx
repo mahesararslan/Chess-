@@ -55,7 +55,7 @@ function SignInPage() {
   const handleGoogleSignIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     const BASE_URL = import.meta.env.VITE_NODE_BACKEND_URL.replace(/\/+$/, '');
-    window.location.replace(`${BASE_URL}/auth/google`);
+    window.location.replace(`${BASE_URL}auth/google`);
 
   }
 
