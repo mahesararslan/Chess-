@@ -2,6 +2,7 @@ import { WebSocket } from "ws";
 import { Chess } from "chess.js";
 import { GAME_OVER, INIT_GAME } from "./messages";
 import { PrismaClient } from '../../node-backend/node_modules/prisma/prisma-client'
+import { Redis } from "ioredis";
 
 const prisma = new PrismaClient();
 
@@ -9,13 +10,19 @@ interface Player {
     socket: WebSocket;
     userId: string;
     userName: string;
+    color?: string;
+}
+
+interface RedisPlayer {
+    userId: string;
+    userName: string;
 }
 
 
-export class Game {
+export class RedisGame {
     public id: string;
     public player1: Player;
-    public player2: Player;
+    public player2: RedisPlayer;
     private board: Chess;
     private moves: string[];
     private startTime: Date;
@@ -23,8 +30,10 @@ export class Game {
     private player2TimeLeft: number;
     private lastMoveTime: Date;
     private currentTurn: Player;
+    private redis: Redis
+    private serverId: string
 
-    constructor(id: string,player1: Player, player2: Player, timeLimit: number) {
+    constructor(id: string,player1: Player, player2: Player, timeLimit: number, serverId: string, redis: Redis) {
         this.id = id;
         this.player1 = player1;
         this.player2 = player2;
@@ -35,6 +44,8 @@ export class Game {
         this.player2TimeLeft = timeLimit * 60 * 1000;
         this.lastMoveTime = new Date();
         this.currentTurn = player1;
+        this.serverId = serverId;
+        this.redis = redis;
 
         if(player1.socket) {
             player1.socket.send(JSON.stringify({
@@ -46,52 +57,66 @@ export class Game {
             }));
         }
 
-        if (player2.socket) {
-            player2.socket.send(JSON.stringify({
-                type: INIT_GAME,
-                payload: {
-                    color: "black",
-                    opponent: player1.userId
-                }
-            }));
-        }
+        // if (player2.socket) {
+        //     player2.socket.send(JSON.stringify({
+        //         type: INIT_GAME,
+        //         payload: {
+        //             color: "black",
+        //             opponent: player1.userId
+        //         }
+        //     }));
+        // }
+        // publish to redis for player2
+        redis.publish('START_GAME', JSON.stringify({
+            serverId,
+            gameId: id,
+            userId: player1.userId,
+            userName: player1.userName,
+            timeLimit,
+            color: "black"
+        }));
+
     }
 
-    private updateTime() {
-        const currentTime = new Date();
-        const timeSpent = currentTime.getTime() - this.lastMoveTime.getTime();
+    // private updateTime() {
+    //     const currentTime = new Date();
+    //     const timeSpent = currentTime.getTime() - this.lastMoveTime.getTime();
 
-        if (this.currentTurn === this.player1) {
-            this.player1TimeLeft -= timeSpent;
-            if (this.player1TimeLeft <= 0) {
-                this.endGame(this.player2.socket, { winner: this.player2.userName, loser: this.player1.userName, timeOut: true });
-                return;
-            }
-        } else {
-            this.player2TimeLeft -= timeSpent;
-            if (this.player2TimeLeft <= 0) {
-                this.endGame(this.player1.socket, { winner: this.player1.userName, loser: this.player2.userName, timeOut: true });
-                return;
-            }
-        }
+    //     if (this.currentTurn === this.player1) {
+    //         this.player1TimeLeft -= timeSpent;
+    //         if (this.player1TimeLeft <= 0) {
+    //             this.endGame(this.player2.socket, { winner: this.player2.userName, loser: this.player1.userName, timeOut: true });
+    //             return;
+    //         }
+    //     } else {
+    //         this.player2TimeLeft -= timeSpent;
+    //         if (this.player2TimeLeft <= 0) {
+    //             this.endGame(this.player1.socket, { winner: this.player1.userName, loser: this.player2.userName, timeOut: true });
+    //             return;
+    //         }
+    //     }
 
-        this.lastMoveTime = currentTime;
-    }
+    //     this.lastMoveTime = currentTime;
+    // }
 
     makeMove(socket: WebSocket, move: { from: string; to: string }) {
-        this.updateTime();
+        // this.updateTime();
 
-        if (this.board.turn() === 'w' && socket === this.player2.socket) {
-            console.log("It is not your turn, white's turn");
-            return;
-        }
+        // if (this.board.turn() === 'w' && socket === this.player2.socket) {
+        //     console.log("It is not your turn, white's turn");
+        //     return;
+        // }
 
-        if (this.board.turn() === 'b' && socket === this.player1.socket) {
-            console.log("It is not your turn, black's turn");
-            return;
-        }
-
+        // if (this.board.turn() === 'b' && socket === this.player1.socket) {
+        //     console.log("It is not your turn, black's turn");
+        //     return;
+        // }
+        console.log("reached before try and catch")
         try {
+            // log the moves in history array.
+            this.board.history().forEach((move: any) => {
+                console.log(move);
+            });
             this.board.move(move);
             this.moves.push(JSON.stringify(move));
         } catch (error) {
@@ -99,20 +124,27 @@ export class Game {
             return;
         }
 
-        const opponentSocket = socket === this.player1.socket ? this.player2.socket : this.player1.socket;
-
-        opponentSocket.send(JSON.stringify({
+        // const opponentSocket = socket === this.player1.socket ? this.player2.socket : this.player1.socket;
+        console.log("sending the move to", this.player1.userName)
+        this.player1.socket.send(JSON.stringify({
             type: "move",
             payload: move
         }));
+        // publish move to redis
+        // this.redis.publish('SYNC_MOVE', JSON.stringify({
+        //     serverId: this.serverId,
+        //     gameId: this.id,
+        //     move: move
+        // }));
+        
 
-        this.currentTurn = socket === this.player1.socket ? this.player2 : this.player1;
-        this.lastMoveTime = new Date();
+        // this.currentTurn = socket === this.player1.socket ? this.player2 : this.player1;
+        // this.lastMoveTime = new Date();
 
 
         if (this.board.isGameOver()) {
-            const winner = this.board.turn() === 'w' ? this.player2 : this.player1;
-            const loser = this.board.turn() === 'w' ? this.player1 : this.player2;
+            const winner = this.board.turn() === 'w' ? (this.player1.color === 'white' ? this.player2 : this.player1) : (this.player1.color === 'black' ? this.player1 : this.player2);
+            const loser = winner === this.player1 ? this.player2 : this.player1;
             const payload = {
                 winner: winner.userName,
                 loser: loser.userName,
@@ -141,15 +173,21 @@ export class Game {
 
         
     }
-    async endGame2(winner: Player, loser: Player, payload: { winner?: string; loser?: string; checkmate:boolean; timeOut?: boolean; resign?: boolean }) {
+    async endGame2(winner: Player | RedisPlayer, loser: Player | RedisPlayer, payload: { winner?: string; loser?: string; checkmate:boolean; timeOut?: boolean; resign?: boolean }) {
 
         this.player1.socket.send(JSON.stringify({
             type: GAME_OVER,
             payload
         }));
 
-        this.player2.socket.send(JSON.stringify({
-            type: GAME_OVER,
+        // this.player2.socket.send(JSON.stringify({
+        //     type: GAME_OVER,
+        //     payload
+        // }));
+        // publish to redis:
+        this.redis.publish('GAME_OVER', JSON.stringify({
+            serverId: this.serverId,
+            gameId: this.id,
             payload
         }));
 
@@ -197,8 +235,14 @@ export class Game {
                 payload
             }));
     
-            this.player2.socket.send(JSON.stringify({
-                type: GAME_OVER,
+            // this.player2.socket.send(JSON.stringify({
+            //     type: GAME_OVER,
+            //     payload
+            // }));
+            // publish to redis
+            this.redis.publish('GAME_OVER', JSON.stringify({
+                serverId: this.serverId,
+                gameId: this.id,
                 payload
             }));
     
@@ -246,8 +290,14 @@ export class Game {
                 payload
             }));
     
-            this.player2.socket.send(JSON.stringify({
-                type: GAME_OVER,
+            // this.player2.socket.send(JSON.stringify({
+            //     type: GAME_OVER,
+            //     payload
+            // }));
+            // publish to redis
+            this.redis.publish('GAME_OVER', JSON.stringify({
+                serverId: this.serverId,
+                gameId: this.id,
                 payload
             }));
     

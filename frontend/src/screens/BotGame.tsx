@@ -21,6 +21,7 @@ const BotGame = () => {
     const [difficulty, setDifficuly] = useState("medium")
     const timeOptions = [3, 5, 10];
     const isBlack = false;
+    const moveSound = useRef(new Audio('/move.wav'));
 
     const makeBotMove = () => {
         let move = null;
@@ -38,6 +39,9 @@ const BotGame = () => {
             setTimeout(() => {
                 chess.move(move);
                 setBoard(chess.board());
+                // updateCheckStatus();
+                moveSound.current.play();
+
             }, 2000);
         }
     };
@@ -210,18 +214,6 @@ const BotGame = () => {
             </div>
         </div>
     </div>
-
-    // return (
-    //     <div>
-    //         <ChessBoard
-    //             chess={chess}
-    //             board={board}
-    //             setBoard={setBoard}
-    //             isBlack={false}
-    //             onPlayerMove={() => makeBotMove()}
-    //         />
-    //     </div>
-    // )
 };
 
 
@@ -254,6 +246,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
         const [showPopup, setShowPopup] = useState(false)
         const [popupData, setPopupData] = useState({ title: "", message: "" })
+        const moveSound = useRef(new Audio('/move.wav'));
     
         // Reverse the board rows if the player is black
         const displayBoard = isBlack ? [...board].reverse() : board;
@@ -284,8 +277,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                 // popup
                 setShowPopup(true);
                 // who won?
-                chess.turn() === 'w' ? setPopupData({ title: "Game Over", message: "It's a checkmate, You Won!" }) :
-                setPopupData({ title: "Game Over", message: "It's a checkmate, You Lost!" });
+                chess.turn() === 'w' ? setPopupData({ title: "Game Over", message: "It's a checkmate, You Lost!" }) :
+                setPopupData({ title: "Game Over", message: "It's a checkmate, You Won!" });
                 setGameState("gameOver");
             }
         };
@@ -333,6 +326,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                         setFrom(null);
                         setSelectedSquare(null);
                         updateCheckStatus();
+                        moveSound.current.play();
                     } else {
                         console.log("Invalid move attempted");
                     }
@@ -359,6 +353,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                         setSelectedSquare(null);
                         updateCheckStatus();
                         onPlayerMove({ from, to: squareRepresentation });
+                        moveSound.current.play();
                     } else {
                         console.log("Invalid move attempted");
                     }

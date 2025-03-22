@@ -1,5 +1,5 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MOVE } from "../utils/messages";
 
 interface Piece {
@@ -30,6 +30,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
     const [whiteKingInCheck, setWhiteKingInCheck] = useState<Square | null>(null);
     const [blackKingInCheck, setBlackKingInCheck] = useState<Square | null>(null);
+    const moveSound = useRef(new Audio('/move.mp3'));
 
     // Reverse the board rows if the player is black
     const displayBoard = isBlack ? [...board].reverse() : board;
@@ -110,6 +111,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                     setFrom(null);
                     setSelectedSquare(null);
                     updateCheckStatus();
+                    moveSound.current.play();
                 } else {
                     console.log("Invalid move attempted");
                 }
@@ -151,6 +153,8 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                 setFrom(null);
                 setSelectedSquare(null);
                 updateCheckStatus();
+                moveSound.current.play();
+                
             } else {
                 console.log("Invalid move attempted");
             }
