@@ -63,7 +63,8 @@ function SignUpPage() {
 
   const handleGoogleSignUp = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    navigate(`${import.meta.env.VITE_NODE_BACKEND_URL}/auth/google`)
+    const BASE_URL = import.meta.env.VITE_NODE_BACKEND_URL.replace(/\/+$/, '');
+    navigate(`${BASE_URL}/auth/google`, { replace: true });
   }
 
   return (
