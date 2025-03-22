@@ -53,7 +53,7 @@ function SignInPage() {
 
   const handleGoogleSignIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    window.location.href = `${import.meta.env.VITE_NODE_BACKEND_URL}/auth/google`;
+    navigate(`${import.meta.env.VITE_NODE_BACKEND_URL}/auth/google`)
   }
 
   return (

@@ -11,6 +11,7 @@ function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [user, setUser] = useState(null)
     const [isScrolled, setIsScrolled] = useState(false)
+    const navigate = useNavigate(); 
 
     const getUser = async (token: string) => {
         
@@ -115,7 +116,7 @@ function Navbar() {
               </div>
             ) : (
               <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded transition-colors"
-                onClick={() => window.location.href = "/signin"}
+                onClick={() => navigate("/signin")}
               >
                 Sign In
               </button>
