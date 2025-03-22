@@ -11,7 +11,6 @@ function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [user, setUser] = useState(null)
     const [isScrolled, setIsScrolled] = useState(false)
-    const navigate = useNavigate(); 
 
     const getUser = async (token: string) => {
         

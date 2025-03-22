@@ -38,7 +38,8 @@ function SignInPage() {
   const onSubmit = async (data: SignInData) => {
     setIsLoading(true)
     try {
-      const response: any = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/signin`, data);
+      const BASE_URL = import.meta.env.VITE_NODE_BACKEND_URL.replace(/\/+$/, '');
+      const response: any = await axios.post(`${BASE_URL}/signin`, data);
       
       if(response.data.token) {
           localStorage.setItem("token", response.data.token);
@@ -53,7 +54,8 @@ function SignInPage() {
 
   const handleGoogleSignIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    navigate(`${import.meta.env.VITE_NODE_BACKEND_URL}/auth/google`)
+    const BASE_URL = import.meta.env.VITE_NODE_BACKEND_URL.replace(/\/+$/, '');
+    navigate(`${BASE_URL}/auth/google`)
   }
 
   return (

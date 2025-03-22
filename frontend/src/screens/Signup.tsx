@@ -46,7 +46,9 @@ function SignUpPage() {
     setIsLoading(true)
     try {
             
-      const response: any = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/signup`, data);
+      const BASE_URL = import.meta.env.VITE_NODE_BACKEND_URL.replace(/\/+$/, '');
+      const response: any = await axios.post(`${BASE_URL}/signup`, data);
+
 
       if(response.data.token) {
           localStorage.setItem("token", response.data.token);
