@@ -3,13 +3,15 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+dotenv.config()
 
 const prisma = new PrismaClient();
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID as string,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    callbackURL: "http://localhost:3001/auth/google/callback",
+    callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
     passReqToCallback: true
   },
   async function (request: any, accessToken: string, refreshToken: string, profile: any, done: any) {
